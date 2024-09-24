@@ -2,3 +2,7 @@
 run.sh
 testrunner.py
 .env
+.vscode/
+*.html
+test.py
+workspace/
