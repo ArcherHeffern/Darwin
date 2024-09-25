@@ -1,8 +1,10 @@
 .venv/
 run.sh
+run2.sh
 testrunner.py
 .env
 .vscode/
 *.html
 test.py
+test2.py
 workspace/

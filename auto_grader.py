@@ -350,15 +350,16 @@ class Installer:
                         raise NotImplementedError('.project is zipped without a root directory')
                     else:
                         raise NotImplementedError(f'.project is deeply nested in zip file located at {dot_project_file}')
-                self.__validate_extracted_file(student, file_submission_group, extracted_file)
+
+                file = self.__validate_extracted_file(student, file_submission_group, extracted_file)
             else:
                 raise NotImplementedError('no zipfile!')
 
-            file_submission.file = file_path # TODO
+            file_submission.file = file 
 
-            return file_submission.file
+            return file
     
-    def __validate_extracted_file(self, student: Student, file_submission_group: FileSubmissionGroup, extracted_file: Path):
+    def __validate_extracted_file(self, student: Student, file_submission_group: FileSubmissionGroup, extracted_file: Path) -> Path:
         """
         Renames extracted file and sets flags on student if improperly named
         
@@ -375,7 +376,10 @@ class Installer:
         # Rename anyways
         extracted_file = Path(self.workspace) / extracted_file
         new_extracted_file = Path(self.workspace) / Path(file_submission_group.get_filename(student))
-        extracted_file.rename(new_extracted_file)
+        if not new_extracted_file.exists():
+            extracted_file.rename(new_extracted_file)
+
+        return new_extracted_file
     
 class StudentFilterer:
     def filter_last_name(self, students: list[Student], _min: str = "", _max: str = "{") -> list[Student]:
@@ -392,9 +396,18 @@ class TestRunner:
     def __init__(self):
         # TODO: Allow for uploading the test dir
         ...
-    
-    def run_tests(self):
+
+    def compile_project(self):
         ...
+    
+    def run_tests(self, project_root: Path):
+        abs_project_root = project_root.absolute()
+        classpath = [
+        f'{abs_project_root}/target/test-classes',
+        f'{abs_project_root}/target/classes',
+        '/Users/archerheffern/.m2/repository/junit/junit/4.12/junit-4.12.jar', 
+        '/Users/archerheffern/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar',
+        ]
 
 # Import projects from workspace
 # Choose the current project root
@@ -432,7 +445,7 @@ if __name__ == '__main__':
     if PRINT_ALL_STUDENTS:
         print('======== All Students ========')
         pprint(students)
-    # students = student_filterer.filter_last_name(students, "he", "he")
+    students = student_filterer.filter_last_name(students, "he", "he")
     if SAFE_MODE:
         print('======== Filtered Students ========')
         pprint(students)
@@ -444,10 +457,17 @@ if __name__ == '__main__':
 
         for submission in student.submissions:
             for file_submission in submission.file_submissions:
+                # ==== Installation ====
                 try:
-                    project_path = installer.install_java_project(student, file_submission, submission)
+                    maybe_project_path: Optional[Path] = installer.install_java_project(student, file_submission, submission)
+                    if not maybe_project_path:
+                        continue
                 except Exception as e:
                     install_logger.error(f'Issue with \'{student.name}\' submission: {e}')
                     DOWNLOAD_ERRORS.append((student, submission, file_submission, e))
+                    continue
+
+                # ==== Test Running ====
+                project_path = maybe_project_path
 
     # pprint(DOWNLOAD_ERRORS)
