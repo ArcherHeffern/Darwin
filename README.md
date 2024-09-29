@@ -60,5 +60,8 @@ Downloads, unzips, moves projects to workspace directory, and performs basic val
 1. MoodleSession cookie
 2. id query string parameter
 
+## Ant
+`brew install ant`
+
 ## Virtual environment
 `pip install -r requirements.txt`

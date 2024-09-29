@@ -1,0 +1,3 @@
+
+class BadConfigException(RuntimeError):
+    ...

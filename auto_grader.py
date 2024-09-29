@@ -1,4 +1,8 @@
 import requests
+from validators_and_executors.eclipsemaven.project_impl import MavenProject
+from validators_and_executors.project_validator_I import ProjectValidator_I
+from validators_and_executors.eclipsemaven.project_validator_Impl import MavenProjectValidator
+from traceback import format_exception
 from colorama import Style, Fore
 from calendar import Month
 from itertools import chain
@@ -12,7 +16,7 @@ from sys import stderr
 from pathlib import Path
 from regex import Match, match
 from bs4 import BeautifulSoup
-from typing import Optional
+from typing import Optional, Self
 from dataclasses import dataclass, field
 
 # ======== PA Context ========
@@ -28,76 +32,31 @@ PRINT_ALL_STUDENTS = False # Prints all students scraped from html
 SAFE_MODE = False # Does not install anything - Instead prints students specified by your range
 INPUT_FILE: Optional[str] = 'out.html'
 VERBOSE_DOWNLOAD: bool = True 
+VERBOSE_PROJECT_VALIDATION: bool = True 
+VERBOSE_TEST_RUNNING: bool = True
 
 # ======== Runtime Errors ========
 DOWNLOAD_ERRORS: list[tuple['Student', 'FileSubmissionGroup', 'FileSubmission', Exception]] = []
-# TEST_RUNNER: dict[tuple['Student', 'FileSubmission', 'FileSubmissionGroup'], str] = {}
+VALIDATION_ERRORS: list[tuple['Student', 'FileSubmissionGroup', 'FileSubmission', Exception]] = []
+TEST_RUNNER_ERRORS: list[tuple['Student', 'FileSubmissionGroup', 'FileSubmission', Exception]] = []
 
 env = dotenv.dotenv_values()
 pprint = PrettyPrinter().pprint
 
 class Logger:
-    def __init__(self, enabled: bool):
+    def __init__(self, enabled: bool = True, name: str = ''):
         self.enabled = enabled
+        if name:
+            name = '[' + name + '] '
+        self.name: str = name
     
     def log(self, s: str):
         if self.enabled:
-            print(s)
+            print(self.name + s)
     
     def error(self, s: str):
         if self.enabled:
-            print(f"{Fore.RED}{s}{Style.RESET_ALL}", file=stderr)
-
-@dataclass
-class Lateness:
-    days: int
-    hours: int
-    minutes: int
-    seconds: int
-
-    literal: Optional[str] = None # For debug purposes
-
-    @staticmethod
-    def from_str(s: str) -> Optional['Lateness']:
-        days = 0
-        hours = 0
-        minutes = 0
-        seconds = 0
-
-        m: Match|None
-
-        # May have to account for months in the future
-
-        # Try parse days late
-        # \d\d? days? \d\d? hours? late
-        if ( m := match('(\\d\\d?) days? (\\d\\d?) hours? late', s) ):
-            days = int(m.group(1))
-            hours = int(m.group(2))
-
-        # Try parse hours late
-        # \d\d? hours? \d\d? mins? late
-        elif ( m:= match('(\\d\\d?) hours? (\\d\\d?) mins? late', s) ):
-            hours = int(m.group(1))
-            minutes = int(m.group(2))
-            
-        # Try parse minutes late
-        # \d\d? mins? \d\d? secs? late
-        elif ( m:= match('(\\d\\d?) mins? (\\d\\d?) secs? late', s) ):
-            minutes = int(m.group(1))
-            seconds = int(m.group(2))
-
-        # Try parse seconds late
-        # \d\d? secs? late
-        elif ( m:= match('(\\d\\d?) secs? late', s) ):
-            seconds = int(m.group(1))
-        
-        else:
-            raise Exception(f"Expected date {s} to follow format")
-
-        return Lateness(days, hours, minutes, seconds, s)
-    
-    def __bool__(self):
-        return bool(self.days or self.hours or self.minutes or self.seconds)
+            print(f"{Fore.RED}{self.name}{s}{Style.RESET_ALL}", file=stderr)
 
 @dataclass
 class FileSubmission:
@@ -279,16 +238,6 @@ class StudentParser:
     def __has_submission(self, submission) -> bool:
         return bool(submission.findChild("td", class_='cell c4').findChild('div', class_='submissionstatussubmitted'))
     
-    def __parse_lateness(self, submission) -> Optional[Lateness]:
-        if not self.__has_submission(submission):
-            return None
-        late_submission_node = submission.findChild("div", class_='latesubmission')
-        if not late_submission_node:
-            return Lateness(0, 0, 0, 0)
-
-        late_submission_text = late_submission_node.text.strip()
-        return Lateness.from_str(late_submission_text)
-
 class Installer:
     def __init__(self, moodle_client: MoodleClient, logger: Logger, workspace: str = '.'):
         self.moodle_client = moodle_client
@@ -306,7 +255,7 @@ class Installer:
         def __exit__(self, *args):
             remove(self.file)
     
-    def install_java_project(self, student: Student, file_submission: FileSubmission, file_submission_group: FileSubmissionGroup) -> Optional[Path]:
+    def install(self, student: Student, file_submission: FileSubmission, file_submission_group: FileSubmissionGroup, validator: ProjectValidator_I) -> Optional[Path]:
         """
         Completes all operations for installing and validating a java project.
 
@@ -325,7 +274,6 @@ class Installer:
 
         l = self.logger
 
-        file_path = Path(self.workspace) / file_submission_group.get_filename(student)
         zip_file_path = Path(self.workspace) / (file_submission_group.get_filename(student) + ".zip")
 
         self.moodle_client.install_file(file_submission.download_url, zip_file_path)
@@ -335,25 +283,19 @@ class Installer:
             if is_zipfile(zip_file_path):
                 with ZipFile(zip_file_path, 'r') as zip_ref:
                     l.log(f'{student.name} zipfile')
-                    dot_project_files = [x for x in zip_ref.namelist() if '.project' == Path(x).name]
-                    if not len(dot_project_files):
-                        raise Exception('.project file not found - Not an eclipse project')
 
-                    # Extract the project depending on how project was zipped
-                    dot_project_file = Path(dot_project_files[0])
-                    num_parts = len(dot_project_file.parts)
-                    extracted_file: Path
-                    if num_parts == 2:
-                        extracted_file = Path(dot_project_file.parts[0])
-                        zip_ref.extractall(self.workspace)
-                    elif num_parts == 1:
+                    project_root: Path = validator.get_zip_project_root(zip_ref.namelist())
+
+                    if project_root is None:
                         raise NotImplementedError('.project is zipped without a root directory')
+                    elif len(project_root.parts) == 1:
+                        zip_ref.extractall(self.workspace)
                     else:
-                        raise NotImplementedError(f'.project is deeply nested in zip file located at {dot_project_file}')
-
-                file = self.__validate_extracted_file(student, file_submission_group, extracted_file)
+                        raise NotImplementedError(f'.project is deeply nested in zip file located at {project_root}')
             else:
                 raise NotImplementedError('no zipfile!')
+            file = self.__validate_extracted_file(student, file_submission_group, project_root)
+
 
             file_submission.file = file 
 
@@ -382,32 +324,43 @@ class Installer:
         return new_extracted_file
     
 class StudentFilterer:
-    def filter_last_name(self, students: list[Student], _min: str = "", _max: str = "{") -> list[Student]:
-        _min = _min.lower()
-        _max = _max.lower()
-        new_students = []
-        for student in students:
-            name = student.name.split()[-1].lower()
-            if _min <= name <= _max:
-                new_students.append(student)
-        return new_students
 
-class TestRunner:
+    LEXICOLGRAPHIC_MIN = ''
+    LEXICOLGRAPHIC_MAX = '{{{{{{{{{{'
+
     def __init__(self):
-        # TODO: Allow for uploading the test dir
-        ...
+        self.__first_name_begin = self.LEXICOLGRAPHIC_MIN
+        self.__first_name_end = self.LEXICOLGRAPHIC_MAX
+        self.__last_name_begin = self.LEXICOLGRAPHIC_MIN
+        self.__last_name_end = self.LEXICOLGRAPHIC_MAX
 
-    def compile_project(self):
-        ...
+    def filter_first_name(self, begin: Optional[str], end: Optional[str]) -> Self:
+        if begin:
+            self.__first_name_begin = begin.lower()
+        if end:
+            self.__first_name_end = end.lower()
+        return self
     
-    def run_tests(self, project_root: Path):
-        abs_project_root = project_root.absolute()
-        classpath = [
-        f'{abs_project_root}/target/test-classes',
-        f'{abs_project_root}/target/classes',
-        '/Users/archerheffern/.m2/repository/junit/junit/4.12/junit-4.12.jar', 
-        '/Users/archerheffern/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar',
-        ]
+    def __filter_first_name(self, student: Student) -> bool:
+        return self.__first_name_begin <= student.name_tokens[0].lower() <= self.__first_name_end
+
+    def filter_last_name(self, begin: Optional[str], end: Optional[str]) -> Self:
+        if begin:
+            self.__last_name_begin = begin.lower()
+        if end:
+            self.__last_name_end = end.lower()
+        return self
+    
+    def __filter_last_name(self, student: Student):
+        # Student does not have a last name
+        return len(student.name_tokens) == 1 \
+        or self.__last_name_begin <= student.name_tokens[-1].lower() <= self.__last_name_end
+    
+    def filter(self, students: list[Student]) -> list[Student]:
+        filtered_students = filter(self.__filter_first_name, students)
+        filtered_students = filter(self.__filter_last_name, filtered_students)
+        return list(filtered_students)
+
 
 # Import projects from workspace
 # Choose the current project root
@@ -424,11 +377,27 @@ if __name__ == '__main__':
         print("ID not found in .env", file=stderr)
         exit(1)
 
+    # Installation Services
     moodle_client = MoodleClient(moodle_session=moodle_session, id=_id)
-    install_logger = Logger(VERBOSE_DOWNLOAD)
+    install_logger = Logger(VERBOSE_DOWNLOAD, 'INSTALL')
     installer = Installer(moodle_client, install_logger, WORKSPACE_DIR)
     student_parser = StudentParser()
-    student_filterer = StudentFilterer()
+    student_filterer = StudentFilterer() # .filter_first_name('binyamin', 'binyamin')
+
+    # Project Validation Services
+    project_validation_logger = Logger(VERBOSE_PROJECT_VALIDATION, 'PROJECT VALIDATION')
+    project_validator = MavenProjectValidator()
+    project = MavenProject(
+        Path('../../compiled_testfiles'),
+        Path('./target/test-classes'),
+        ['AllSequentialTests'],
+        Path('./target/surefire-reports/TEST-cs131.pa1.AllSequentialTests.xml'),
+        2.5
+    )
+
+    # Test Running Services
+
+    test_running_logger = Logger(VERBOSE_TEST_RUNNING, 'TEST RUNNER')
 
     if INPUT_FILE:
         with open(INPUT_FILE, 'r') as f:
@@ -445,7 +414,7 @@ if __name__ == '__main__':
     if PRINT_ALL_STUDENTS:
         print('======== All Students ========')
         pprint(students)
-    students = student_filterer.filter_last_name(students, "he", "he")
+    students = student_filterer.filter(students)
     if SAFE_MODE:
         print('======== Filtered Students ========')
         pprint(students)
@@ -457,17 +426,25 @@ if __name__ == '__main__':
 
         for submission in student.submissions:
             for file_submission in submission.file_submissions:
-                # ==== Installation ====
+                # ==== Installation and Validation ====
                 try:
-                    maybe_project_path: Optional[Path] = installer.install_java_project(student, file_submission, submission)
-                    if not maybe_project_path:
+                    maybe_project_root: Optional[Path] = installer.install(student, file_submission, submission, project_validator)
+                    if not maybe_project_root:
                         continue
                 except Exception as e:
-                    install_logger.error(f'Issue with \'{student.name}\' submission: {e}')
+                    install_logger.error(f'Issue with installing \'{student.name}\' submission: {e}')
                     DOWNLOAD_ERRORS.append((student, submission, file_submission, e))
                     continue
 
-                # ==== Test Running ====
-                project_path = maybe_project_path
+                project_root = maybe_project_root
 
-    # pprint(DOWNLOAD_ERRORS)
+                # ==== Test Running ====
+                try:
+                    # eclipse.get_tests()
+                    results = project.run(project_root)
+                    print(results)
+                except Exception as e:
+                    test_running_logger.error(f'Issue with running \'{student.name}\' tests: {''.join(format_exception(e))}')
+                    TEST_RUNNER_ERRORS.append((student, submission, file_submission, e))
+                    continue
+                    

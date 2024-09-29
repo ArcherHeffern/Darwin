@@ -8,3 +8,4 @@ testrunner.py
 test.py
 test2.py
 workspace/
+**/__pycache__
