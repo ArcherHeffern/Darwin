@@ -2,7 +2,8 @@ from abc import abstractmethod
 from os import rmdir, getcwd, chdir
 from typing import Self
 from pathlib import Path
-from .test_result import TestResult
+from Atypes import TestResult
+
 
 class Project_I:
     """This may only be instantiated via the 'to_project' method of project_validator_impl"""
@@ -21,7 +22,6 @@ class Project_I:
         finally:
             chdir(prev_dir)
 
-    
     @abstractmethod
     def clean(self):
         raise NotImplementedError
@@ -40,17 +40,15 @@ class Project_I:
         """
         raise NotImplementedError
 
-
     @abstractmethod
     def compile_project(self):
         """Does not compile test files"""
         raise NotImplementedError
-    
+
     @abstractmethod
     def get_tests(self):
         raise NotImplementedError
-    
+
     @abstractmethod
     def run_tests(self) -> TestResult:
         raise NotImplementedError
-

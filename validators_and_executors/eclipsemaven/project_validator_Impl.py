@@ -1,8 +1,9 @@
 from ..project_validator_I import ProjectValidator_I
 from pprint import pprint
-from ..project_validation_exception import ProjectValidationException
+from Atypes import ProjectValidationException
 from os.path import dirname
 from pathlib import Path
+
 
 class MavenProjectValidator(ProjectValidator_I):
     def get_zip_project_root(self, files: list[str]) -> Path:
@@ -15,19 +16,21 @@ class MavenProjectValidator(ProjectValidator_I):
 
     def __is_project(self, files: list[str]) -> Path:
         """Returns root of project"""
-        dot_project_files = [x for x in files if '.project' == Path(x).name]
-        dot_classpath_files = [x for x in files if '.classpath' == Path(x).name]
-        pom_files = [x for x in files if 'pom.xml' == Path(x).name]
+        dot_project_files = [x for x in files if ".project" == Path(x).name]
+        dot_classpath_files = [x for x in files if ".classpath" == Path(x).name]
+        pom_files = [x for x in files if "pom.xml" == Path(x).name]
 
         # One of each file and correct type
-        error = ''
+        error = ""
         if len(dot_project_files) != 1:
-            error += f'Expected 1 .project file but found {len(dot_project_files)}\n'
+            error += f"Expected 1 .project file but found {len(dot_project_files)}\n"
         if len(dot_classpath_files) != 1:
-            error += f'Expected 1 .classpath file but found {len(dot_classpath_files)}\n'
+            error += (
+                f"Expected 1 .classpath file but found {len(dot_classpath_files)}\n"
+            )
         if len(pom_files) < 1:
-            error += f'Expected 1 pom.xml file but found 0\n'
-        
+            error += f"Expected 1 pom.xml file but found 0\n"
+
         if error:
             raise ProjectValidationException(error)
 
@@ -35,11 +38,11 @@ class MavenProjectValidator(ProjectValidator_I):
         dot_classpath = Path(dot_classpath_files[0])
         pom = Path(pom_files[0])
 
-        if dirname( dot_project ) != dirname( dot_classpath ) \
-        or dirname( dot_project ) != dirname( pom ):
-            raise Exception('Config files are not all at same level')
-        return Path( dirname( dot_project ) )
-
+        if dirname(dot_project) != dirname(dot_classpath) or dirname(
+            dot_project
+        ) != dirname(pom):
+            raise Exception("Config files are not all at same level")
+        return Path(dirname(dot_project))
 
     def get_project_root(self, directory_root: Path) -> Path:
         """
@@ -51,7 +54,7 @@ class MavenProjectValidator(ProjectValidator_I):
         for x in directory_root.walk():
             path, dirs, files = x
             for dir in dirs:
-                namelist.append( (path / dir ).as_posix() + '/' )
+                namelist.append((path / dir).as_posix() + "/")
             for file in files:
-                namelist.append( (path / file).as_posix() )
+                namelist.append((path / file).as_posix())
         return self.__is_project(namelist)

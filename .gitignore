@@ -1,11 +1,9 @@
 .venv/
-run.sh
-run2.sh
-testrunner.py
 .env
 .vscode/
 *.html
-test.py
-test2.py
 workspace/
 **/__pycache__
+TestStudentPA1*
+compiled_testfiles
+out.csv

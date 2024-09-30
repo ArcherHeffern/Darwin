@@ -15,3 +15,17 @@
 - additional types of scoring eg. Did they do X (Take them to the most likely location)
 - Daemon: Continually check if any PA's were uploaded late
 - TA pinging system
+
+# Blockers
+- Persistant data: How best to flexibly store to either disk, database, or remotely on moodle
+Idea: 
+1. Create storage interface 
+2. What methods does it have? 
+3. get_file(file_urn), store_file(course, assignment, student, submission) 
+
+
+Installing: Just getting the objects
+Storing: Persistantly storing Assignment, Grades, etc
+Uploading: To moodle
+
+Handling multiple data stores
