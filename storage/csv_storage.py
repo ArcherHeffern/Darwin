@@ -1,5 +1,5 @@
 from typing import Self
-from Atypes import Assignment, Student, TestResult
+from models.backend_models import Assignment, Student, TestResult
 from csv import DictWriter
 from pathlib import Path
 

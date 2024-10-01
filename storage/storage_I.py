@@ -1,24 +1,21 @@
-from Atypes import Student
+from models.backend_models import Account, Assignment, Course, Student
+from abc import ABC
 
 
-class Storage_I:
+class Storage_I(ABC):
     # Download to disk
-    def store_course(self): ...
 
-    def store_assignment(self): ...
-
-    def store_scrape(self):
-        """Contains students, zip urns, grades, etc"""
-        ...
-
-    def upload_grade(self, student: Student):
+    def create_course(self, course: Course) -> Course: 
+        raise NotImplementedError
+    
+    def update_course(self, course: Course) -> bool:
+        raise NotImplementedError
+    
+    def delete_course(self, course: Course) -> bool:
         raise NotImplementedError
 
-    def upload_grades(self, students: list[Student]):
+    def store_assignment(self, assignment: Assignment): 
         raise NotImplementedError
 
-    def load_grade(self, student: Student):
-        raise NotImplementedError
-
-    def load_grades(self, student: Student):
+    def create_account(self, account: Account) -> Account:
         raise NotImplementedError
