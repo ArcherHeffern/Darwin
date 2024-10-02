@@ -1,5 +1,5 @@
 from models.backend_models import Assignment, Student, FileSubmission, FileSubmissionGroup
-from utils import flatmap
+from midtier.utils import flatmap
 from collections import defaultdict
 from bs4 import BeautifulSoup
 from datetime import datetime

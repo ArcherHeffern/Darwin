@@ -3,7 +3,7 @@ from typing import Optional
 from zipfile import is_zipfile, ZipFile
 from clients.client_I import Client_I
 from clients.student_filterer import StudentFilterer
-from utils import Logger
+from midtier.utils import Logger
 from os import makedirs, remove
 from pathlib import Path
 
