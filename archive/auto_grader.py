@@ -1,4 +1,4 @@
-from Atypes import (
+from models.backend_models import (
     Assignment,
     AssignmentMetadata,
     Student,
@@ -8,7 +8,7 @@ from Atypes import (
 )
 from clients.moodle.moodle_client import MoodleClient
 from clients.student_filterer import StudentFilterer
-from installer import Installer
+from midtier.modules.installers.installer import Installer
 from storage.csv_storage import CSVStorage
 from validators_and_executors.eclipsemaven.project_impl import MavenProject
 from validators_and_executors.eclipsemaven.project_validator_Impl import (
@@ -18,7 +18,7 @@ from traceback import format_exception
 from datetime import datetime
 import dotenv
 from pprint import PrettyPrinter
-from utils import Logger
+from midtier.utils import Logger
 from sys import stderr
 from pathlib import Path
 from typing import Optional, Literal
@@ -33,14 +33,13 @@ DUE_DATE = datetime(2024, 9, 19, 23, 59, 59)
 SOURCE: Literal["moodle"] = "moodle"
 PROJECT_TYPE: Literal["maven"] = "maven"
 TEST_CLASS_FILES: Path = Path("./compiled_testfiles").absolute()
-OUTPUT_TYPE: Literal["csv", "moodle"] = "csv"
 TESTS_TO_RUN: list[str] = ["AllSequentialTests"]
 
 METADATA = AssignmentMetadata(None)
 
 # ======== Assignment Config ========
 assignment = Assignment(
-    PA_NAME, DUE_DATE, SOURCE, PROJECT_TYPE, OUTPUT_TYPE, TESTS_TO_RUN, METADATA
+    None, PA_NAME, DUE_DATE, SOURCE, PROJECT_TYPE, TESTS_TO_RUN, METADATA
 )
 
 # ======== Arguments ========
@@ -126,7 +125,7 @@ if __name__ == "__main__":
         for student in students:
             if len(student.submissions) == 0:
                 print("=============")
-                print(f"{student.name} has no submissions...")
+                print(f"{student.account.name} has no submissions...")
             if len(student.submissions) > 1:
                 print("NOT IMPLEMENTED HANDLING Student has more than 1 submission")
                 student.submissions = [student.submissions[0]]
@@ -144,7 +143,7 @@ if __name__ == "__main__":
                             continue
                     except Exception as e:
                         install_logger.error(
-                            f"Issue with installing '{student.name}' submission: {e}"
+                            f"Issue with installing '{student.account.name}' submission: {e}"
                         )
                         DOWNLOAD_ERRORS.append(
                             (student, submission, file_submission, e)
@@ -158,7 +157,7 @@ if __name__ == "__main__":
                         results = project.run(project_root)
                     except Exception as e:
                         test_running_logger.error(
-                            f"Issue with running '{student.name}' tests: {''.join(format_exception(e))}"
+                            f"Issue with running '{student.account.name}' tests: {''.join(format_exception(e))}"
                         )
                         TEST_RUNNER_ERRORS.append(
                             (student, submission, file_submission, e)

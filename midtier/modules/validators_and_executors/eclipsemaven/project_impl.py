@@ -1,11 +1,11 @@
 from os import symlink
 from typing import Optional
-from Atypes import BadConfigException, ProjectExecutionException, TestCase
+from models.backend_models import BadConfigException, ProjectExecutionException, TestCase
 import xml.etree.ElementTree as ET
 from subprocess import run, DEVNULL
 from pathlib import Path
 from ..project_I import Project_I
-from Atypes import TestResult
+from models.backend_models import TestResult
 
 
 class MavenProject(Project_I):

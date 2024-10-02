@@ -1,16 +1,27 @@
+
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+from enum import Enum
 from typing import Optional, Literal
 from pathlib import Path
 
 
 @dataclass
+class Course:
+    id: int
+    name: str
+    teachers: list['Teacher']
+    students: list['Student']
+    head_tas: list['Ta']
+    tas: list['Ta']
+
+@dataclass
 class Assignment:
+    id: Optional[int]
     name: str
     due_date: datetime
     source: Literal["moodle"]
     project_type: Literal["maven"]
-    output_type: Literal["csv", "moodle"]
     tests_to_run: list[str]
 
     metadata: "AssignmentMetadata"
@@ -22,13 +33,36 @@ class AssignmentMetadata:
 
 
 @dataclass
-class Student:
-    sid: int  # Student id
+class Account:
+    id: int  # Student id - Not nullable because this is known by moodle
     name: str  # Capitalized
-    name_tokens: list[str]  # Each capitalized
     email: str
+    password: Optional['str'] # Null if account is inactive
+    status: 'AccountState'
+
+class AccountState(Enum):
+    inactive = 0
+    active = 1
+    deleted = 2
+
+@dataclass
+class Teacher:
+    id: int
+    account: Account
+    resigned: bool
+
+@dataclass
+class Student:
+    id: int
+    account: Account
+    course: Course
+    dropped: bool
     submissions: list["FileSubmissionGroup"] = field(default_factory=list)
 
+@dataclass
+class Ta:
+    id: int
+    account: Account
 
 @dataclass
 class TestResult:
@@ -101,9 +135,9 @@ class FileSubmissionGroup:
         if self.__filename:
             return self.__filename
         filename: str = (
-            str(student.sid)
+            str(student.id)
             + "_"
-            + "".join(student.name_tokens)
+            + "".join(student.account.name.split())
             + "_"
             + str(self.assignment_config.name)
         )
@@ -112,6 +146,9 @@ class FileSubmissionGroup:
 
 
 # Exceptions
+class StorageException(RuntimeError): ...
+
+
 class BadConfigException(RuntimeError): ...
 
 

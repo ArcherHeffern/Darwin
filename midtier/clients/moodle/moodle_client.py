@@ -2,7 +2,7 @@ from clients.moodle.moodle_parser import StudentParser
 from clients.student_filterer import StudentFilterer
 from ..client_I import Client_I
 import requests
-from Atypes import Student, Assignment
+from models.backend_models import Student, Assignment
 from pathlib import Path
 
 

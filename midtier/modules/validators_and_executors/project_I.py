@@ -2,7 +2,7 @@ from abc import abstractmethod
 from os import rmdir, getcwd, chdir
 from typing import Self
 from pathlib import Path
-from Atypes import TestResult
+from models.backend_models import TestResult
 
 
 class Project_I:

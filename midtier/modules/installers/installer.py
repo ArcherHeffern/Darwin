@@ -1,4 +1,4 @@
-from Atypes import Student, FileSubmission, FileSubmissionGroup
+from models.backend_models import Student, FileSubmission, FileSubmissionGroup
 from typing import Optional
 from zipfile import is_zipfile, ZipFile
 from clients.client_I import Client_I

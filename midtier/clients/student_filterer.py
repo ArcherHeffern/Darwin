@@ -1,5 +1,5 @@
 from typing import Optional, Self
-from Atypes import Student
+from models.backend_models import Student
 
 
 class StudentFilterer:

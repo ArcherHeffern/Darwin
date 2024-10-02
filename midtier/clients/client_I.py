@@ -1,4 +1,4 @@
-from Atypes import Student
+from models.backend_models import Student
 from abc import ABC, abstractmethod
 from pathlib import Path
 

@@ -1,6 +1,6 @@
 from ..project_validator_I import ProjectValidator_I
 from pprint import pprint
-from Atypes import ProjectValidationException
+from models.backend_models import ProjectValidationException
 from os.path import dirname
 from pathlib import Path
 

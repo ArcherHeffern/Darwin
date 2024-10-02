@@ -1,7 +1,7 @@
 from pathlib import Path
 from models.backend_models import Account, AccountId, AccountStatus
 
-from storage.sqlite.dal import SQLiteStorage
+from backend.dal import SQLiteStorage
 
 
 if __name__ == "__main__":
