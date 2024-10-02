@@ -1,12 +1,13 @@
-from Atypes import Assignment
+from pathlib import Path
+from models.backend_models import Account, AccountId, AccountStatus
 
-assignment_configs: list[Assignment] = []
-
-
-def new_assignment() -> Assignment: ...
+from storage.sqlite.dal import SQLiteStorage
 
 
-def download(): ...
-
-
-def grade_all(assignment_config: Assignment): ...
+if __name__ == "__main__":
+    service = SQLiteStorage.connect(Path("./db"))
+    account = Account(
+        AccountId(1), "tim", "tim@gmail.com", "123", AccountStatus.UNREGISTERED
+    )
+    service.account_dal.create_account(account)
+    service.account_dal.get_account(AccountId(1))
