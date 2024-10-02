@@ -1,14 +1,8 @@
+from enum import Enum
+from dotenv import dotenv_values
 from sqlite3 import Connection
-
-PROJECT_TYPES = ((1, "GRADLE"),)
-SOURCE_TYPES = (
-    (1, "LOCAL_SQLITE"),
-    (2, "MOODLE"),
-)
-BLOB_LOCATION_TYPE = ((1, "DISK"), (2, "LOCAL_SQLITE"))
-TEST_STATUSES = ((1, "SKIPPED"), (2, "FAILING"), (3, "ERRORING"))
-ACCOUNT_STATUSES = ((1, "UNREGISTERED"), (2, "REGISTERED"), (3, "DELETED"))
-
+from typing import Iterable
+from models.backend_models import AccountPermission, ProjectType, SourceType, BlobLocationType, TestStatus, AccountStatus
 
 class DbInit:
     def __init__(self, c: Connection):
@@ -36,6 +30,10 @@ class DbInit:
             self.__create_blob_location_type_enum_table(c)
             self.__create_test_status_enum_table(c)
             self.__create_account_status_enum_table(c)
+            self.__create_account_permission_enum_table(c)
+
+            # Necessary Data
+            self.__create_admin_account(c)
 
     def __create_account_table(self, c: Connection):
         c.execute(
@@ -47,10 +45,15 @@ class DbInit:
                 email           TEXT NOT NULL,
                 password        TEXT,
                 status_f        INTEGER NOT NULL,
+                permission_f   INTEGER NOT NULL,
 
-                FOREIGN KEY (status_f) REFERENCES account_status
+                FOREIGN KEY (status_f) REFERENCES account_status,
+                FOREIGN KEY (permission_f) REFERENCES account_permission
             );"""
         )
+    
+    def __enum_to_tuple(self, enum: Enum.__class__) -> Iterable[tuple[int, str]]:
+        return [(e.value, e.name) for e in enum]
 
     def __create_assignment_table(self, c):
         c.execute(
@@ -251,7 +254,7 @@ class DbInit:
         INSERT OR IGNORE INTO project_type (id, name) VALUES (?, ?)
         ;
         """,
-            PROJECT_TYPES,
+            self.__enum_to_tuple(ProjectType),
         )
 
     def __create_source_type_enum_table(self, c: Connection):
@@ -268,7 +271,7 @@ class DbInit:
             --sql
             INSERT OR IGNORE INTO source_type (id, name) VALUES (?, ?)
             ;""",
-            SOURCE_TYPES,
+            self.__enum_to_tuple(SourceType),
         )
 
     def __create_blob_location_type_enum_table(self, c: Connection):
@@ -285,7 +288,7 @@ class DbInit:
             --sql
             INSERT OR IGNORE INTO blob_location_type (id, name) VALUES (?, ?)
             ;""",
-            BLOB_LOCATION_TYPE,
+            self.__enum_to_tuple(BlobLocationType),
         )
 
     def __create_test_status_enum_table(self, c: Connection):
@@ -302,7 +305,7 @@ class DbInit:
             --sql
             INSERT OR IGNORE INTO test_status (id, status) VALUES (?, ?) 
             ;""",
-            TEST_STATUSES,
+            self.__enum_to_tuple(TestStatus),
         )
 
     def __create_account_status_enum_table(self, c: Connection):
@@ -320,5 +323,39 @@ class DbInit:
             --sql
             INSERT OR IGNORE INTO account_status (id, name) VALUES (?, ?)
             ;""",
-            ACCOUNT_STATUSES,
+            self.__enum_to_tuple(AccountStatus),
         )
+    def __create_account_permission_enum_table(self, c: Connection):
+        c.execute(
+            """
+            --sql
+            CREATE TABLE IF NOT EXISTS account_permission (
+                id      INTEGER PRIMARY KEY,
+                name    TEXT NOT NULL UNIQUE    
+            );"""
+        )
+
+        c.executemany(
+            """
+            --sql
+            INSERT OR IGNORE INTO account_permission (id, name) VALUES (?, ?) 
+            ;""", self.__enum_to_tuple(AccountPermission)
+        )
+
+    ##################################
+    # ======== Necessary Data ########
+    ##################################
+
+    def __create_admin_account(self, c: Connection):
+        dot_env = dotenv_values()
+        admin_username = dot_env.get('ADMIN_USERNAME')
+        admin_email = dot_env.get('ADMIN_EMAIL')
+        admin_password = dot_env.get('ADMIN_PASSWORD')
+
+        if not admin_username or not admin_email or not admin_password:
+            raise Exception('Expected admin config in .env')
+        
+        c.execute("""
+        --sql
+        INSERT OR IGNORE INTO account (name, email, password, status_f, permission_f) VALUES (?, ?, ?, ?, ?);
+        """, (admin_username, admin_email, admin_password, AccountStatus.REGISTERED.value, AccountPermission.ADMIN.value))

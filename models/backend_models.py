@@ -29,6 +29,7 @@ class Account:
     email: str
     password: Optional["str"]  # Null if account is inactive
     status: "AccountStatus"
+    permission: 'AccountPermission'
 
 
 @dataclass
@@ -161,7 +162,13 @@ class AccountStatus(Enum):
     UNREGISTERED = 1
     REGISTERED = 2
     DELETED = 3
+    REQUESTED = 4
+    DENIED = 5
 
+class AccountPermission(Enum):
+    NONE = 1
+    TEACHER = 2
+    ADMIN = 3
 
 # Exceptions
 class StorageException(RuntimeError): ...
