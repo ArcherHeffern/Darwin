@@ -64,4 +64,7 @@ Downloads, unzips, moves projects to workspace directory, and performs basic val
 `brew install ant`
 
 ## Virtual environment
-`pip install -r requirements.txt`
+`pip install .`
+
+# Running
+`fastapi def application.py`

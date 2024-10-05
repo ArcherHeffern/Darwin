@@ -1,5 +1,5 @@
 from sqlite3 import Connection
-from models.backend_models import Course, StorageException
+from src.darwin.models.backend_models import Course, StorageException
 
 """
 

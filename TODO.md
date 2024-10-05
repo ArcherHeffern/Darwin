@@ -17,15 +17,12 @@
 - TA pinging system
 
 # Blockers
-- Persistant data: How best to flexibly store to either disk, database, or remotely on moodle
-Idea: 
-1. Create storage interface 
-2. What methods does it have? 
-3. get_file(file_urn), store_file(course, assignment, student, submission) 
+Data models that may be based on data from another source with its own ID
+Linking accounts that were created
+Authentication + Protected routes
+How to break up mid tier API
 
-
-Installing: Just getting the objects
-Storing: Persistantly storing Assignment, Grades, etc
-Uploading: To moodle
-
-Handling multiple data stores
+Doing rn: 
+- Teacher Sign up
+- Sending confirmation email once teacher is accepted
+- Moodle login? 

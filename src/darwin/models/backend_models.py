@@ -25,8 +25,8 @@ SubmissionGroupId = NewType("SubmissionGroupId", int)
 @dataclass
 class Account:
     id: AccountId
-    name: str  # Capitalized
     email: str
+    name: str  # Capitalized
     password: Optional["str"]  # Null if account is inactive
     status: "AccountStatus"
     permission: 'AccountPermission'
@@ -45,7 +45,7 @@ class Assignment:
     assignment_stub_reference: str
     assignment_testfiles_location_type_f: "BlobLocationType"
     assignment_testfiles_reference: str
-    last_downloaded: Optional[str]
+    last_downloaded: Optional[datetime]
     deleted: bool
 
 

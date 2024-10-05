@@ -2,7 +2,7 @@ from enum import Enum
 from dotenv import dotenv_values
 from sqlite3 import Connection
 from typing import Iterable
-from models.backend_models import AccountPermission, ProjectType, SourceType, BlobLocationType, TestStatus, AccountStatus
+from src.darwin.models.backend_models import AccountPermission, ProjectType, SourceType, BlobLocationType, TestStatus, AccountStatus
 
 class DbInit:
     def __init__(self, c: Connection):
@@ -40,15 +40,16 @@ class DbInit:
             """ 
             --sql
             CREATE TABLE IF NOT EXISTS account (
-                id              INTEGER PRIMARY KEY,
+                id              INTEGER NOT NULL,
+                email           TEXT NOT NULL UNIQUE,
                 name            TEXT(50) NOT NULL,
-                email           TEXT NOT NULL,
                 password        TEXT,
                 status_f        INTEGER NOT NULL,
-                permission_f   INTEGER NOT NULL,
+                permission_f    INTEGER NOT NULL,
 
                 FOREIGN KEY (status_f) REFERENCES account_status,
-                FOREIGN KEY (permission_f) REFERENCES account_permission
+                FOREIGN KEY (permission_f) REFERENCES account_permission,
+                PRIMARY KEY (id, email)
             );"""
         )
     

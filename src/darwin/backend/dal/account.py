@@ -1,6 +1,6 @@
 from sqlite3 import Connection
 from typing import Optional
-from models.backend_models import Account, AccountStatus, StorageException
+from src.darwin.models.backend_models import Account, AccountStatus, StorageException
 
 
 class AccountDal:

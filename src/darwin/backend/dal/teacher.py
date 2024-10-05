@@ -1,7 +1,6 @@
 from sqlite3 import Connection
-from uuid import uuid4
 
-from models.backend_models import Teacher, TeacherId
+from src.darwin.models.backend_models import Teacher, TeacherId
 
 
 class TeacherDal:
