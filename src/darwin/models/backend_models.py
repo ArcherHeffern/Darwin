@@ -4,10 +4,11 @@ from datetime import datetime, timedelta
 from enum import Enum
 from typing import Optional
 
-# This is a lightweight approach to backend models
-# These models almost exactly reflect how data is stored in our database. The only exceptions are Enums, which will be resolved.
-
-# IDs
+"""
+============
+IDs
+============
+"""
 CourseId = NewType("CourseId", int)
 AssignmentId = NewType("AssignmentId", int)
 TestToRunId = NewType("TestToRunId", int)
@@ -22,6 +23,11 @@ TestCaseId = NewType("TestCaseId", int)
 SubmissionGroupId = NewType("SubmissionGroupId", int)
 
 
+"""
+============
+Account 
+============
+"""
 class Account(BaseModel):
     id: AccountId
     email: str
@@ -34,6 +40,11 @@ class Account(BaseModel):
         from_attributes = True
 
 
+"""
+============
+Assignment 
+============
+"""
 class Assignment(BaseModel):
     id: AssignmentId
     course_f: CourseId
@@ -52,20 +63,25 @@ class Assignment(BaseModel):
     class Config:
         from_attributes = True
 
-class BaseCourse(BaseModel):
-    name: str
-
-class CourseCreate(BaseCourse):
-    ...
-
+"""
+============
+Course
+============
+"""
 class Course(BaseModel):
     id: CourseId
+    name: str
     deleted: bool
 
     class Config:
         from_attributes = True
 
 
+"""
+============
+GradingMetadata
+============
+"""
 class GradingMetadata(BaseModel):
     id: GradingMetadataId
     submission_f: SubmissionId

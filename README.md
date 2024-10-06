@@ -67,4 +67,4 @@ Downloads, unzips, moves projects to workspace directory, and performs basic val
 `pip install .`
 
 # Running
-`fastapi def application.py`
+`fastapi dev application.py`

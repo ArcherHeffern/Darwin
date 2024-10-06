@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from src.darwin.backend.dal.dal import assignment_dal as assignment
+from src.darwin.backend.dal import Dal
+
 
 router = APIRouter(
     prefix='/assignment',
@@ -9,4 +10,4 @@ router = APIRouter(
 
 @router.get('/')
 def get_assignments():
-    return assignment.get_all(), 200
+    return Dal.assignment_dal.get_all(), 200

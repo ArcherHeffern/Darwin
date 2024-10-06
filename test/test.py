@@ -2,7 +2,9 @@ from datetime import datetime
 from src.darwin.models.backend_models import Account, AccountId, AccountPermission, AccountStatus, Assignment, AssignmentId, BlobLocationType, CourseId, ProjectType, SourceType
 from unittest import TestCase
 from uuid import uuid4
-from src.darwin.backend.dal.dal import account_dal, assignment_dal
+from darwin.backend.dal import Dal
+
+account = Dal.account_dal
 
 
 class AssignmentTests(TestCase):
@@ -30,6 +32,6 @@ class AccountTests(TestCase):
         account = Account(
             AccountId(2), "tim", "tim@gmail.com", "123", AccountStatus.UNREGISTERED, AccountPermission.ADMIN
         )
-        account_dal.create_account(account)
-        account_dal.get_account(AccountId(1))
-        account_dal.get_account(AccountId(2))
+        account.create_account(account)
+        account.get_account(AccountId(1))
+        account.get_account(AccountId(2))
