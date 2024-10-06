@@ -1,13 +1,33 @@
 # type: ignore
-from darwin.models.backend_models import AccountId, AccountPermission, AccountStatus, AssignmentId, BlobLocationType, CourseId, GradingMetadataId, NonPassingTestId, ProjectType, SourceType, StudentId, SubmissionGroupId, SubmissionId, TaId, TeacherId, TestCaseId, TestStatus, TestToRunId
-from sqlalchemy import  Boolean, Column, Enum, ForeignKey, Integer, String, Text
+from darwin.models.backend_models import (
+    AccountId,
+    AccountPermission,
+    AccountStatus,
+    AssignmentId,
+    BlobLocationType,
+    CourseId,
+    GradingMetadataId,
+    NonPassingTestId,
+    ProjectType,
+    SourceType,
+    StudentId,
+    SubmissionGroupId,
+    SubmissionId,
+    TaId,
+    TeacherId,
+    TestCaseId,
+    TestStatus,
+    TestToRunId,
+)
+from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 
 from .db_init import Base
 
+
 class Account(Base):
-    __tablename__ = 'account'
+    __tablename__ = "account"
 
     id: AccountId = Column(Integer, primary_key=True)
     email: str = Column(String, unique=True, index=True, nullable=False)
@@ -18,37 +38,44 @@ class Account(Base):
 
 
 class Assignment(Base):
-    __tablename__ = 'assignment'
+    __tablename__ = "assignment"
 
     id: AssignmentId = Column(Integer, primary_key=True)
-    course_f: CourseId = Column(Integer, ForeignKey('course.id'), nullable=False)
+    course_f: CourseId = Column(Integer, ForeignKey("course.id"), nullable=False)
     name: str = Column(Text, nullable=False)
     due_date: str = Column(Text, nullable=False)
     project_type: ProjectType = Column(Enum(ProjectType), nullable=False)
     source_type: SourceType = Column(Enum(SourceType), nullable=False)
     source_reference: str = Column(Text, nullable=False)
-    assignment_stub_location_type: BlobLocationType = Column(Enum(BlobLocationType), nullable=False)
+    assignment_stub_location_type: BlobLocationType = Column(
+        Enum(BlobLocationType), nullable=False
+    )
     assignment_stub_reference: str = Column(Text, nullable=False)
-    assignment_testfiles_location_type: BlobLocationType = Column(Enum(BlobLocationType), nullable=True)
+    assignment_testfiles_location_type: BlobLocationType = Column(
+        Enum(BlobLocationType), nullable=True
+    )
     assignment_testfiles_reference: str = Column(Text, nullable=False)
     last_downloaded: str = Column(Text, nullable=True)
     deleted: bool = Column(Boolean, nullable=False, default=False)
 
     course = relationship("Course")
 
-class Course(Base):
-    __tablename__ = 'course'
 
-    id: int = Column(Integer, primary_key=True)  
+class Course(Base):
+    __tablename__ = "course"
+
+    id: int = Column(Integer, primary_key=True)
     name: str = Column(Text, nullable=False)
-    deleted: bool = Column(Boolean, nullable=False) 
+    deleted: bool = Column(Boolean, nullable=False)
 
 
 class GradingMetadata(Base):
-    __tablename__ = 'grading_metadata'
-    
+    __tablename__ = "grading_metadata"
+
     id: GradingMetadataId = Column(Integer, primary_key=True)
-    submission_f: SubmissionId = Column(Integer, ForeignKey('submission.id'), nullable=False)
+    submission_f: SubmissionId = Column(
+        Integer, ForeignKey("submission.id"), nullable=False
+    )
     passing: int = Column(Integer, nullable=False, default=0)
     failing: int = Column(Integer, nullable=False, default=0)
     erroring: int = Column(Integer, nullable=False, default=0)
@@ -59,12 +86,17 @@ class GradingMetadata(Base):
 
     submission = relationship("Submission")
 
+
 class NonPassingTest(Base):
-    __tablename__ = 'non_passing_test'
+    __tablename__ = "non_passing_test"
 
     id: NonPassingTestId = Column(Integer, primary_key=True)
-    submission_group_f: SubmissionGroupId = Column(Integer, ForeignKey('submission_group.id'), nullable=False)
-    test_case_f: TestCaseId = Column(Integer, ForeignKey('test_case.id'), nullable=False)
+    submission_group_f: SubmissionGroupId = Column(
+        Integer, ForeignKey("submission_group.id"), nullable=False
+    )
+    test_case_f: TestCaseId = Column(
+        Integer, ForeignKey("test_case.id"), nullable=False
+    )
     status_f: TestStatus = Column(Enum(TestStatus), nullable=False)
     reason: str = Column(Text, nullable=False)
 
@@ -73,11 +105,11 @@ class NonPassingTest(Base):
 
 
 class Student(Base):
-    __tablename__ = 'student'
-    
+    __tablename__ = "student"
+
     id: StudentId = Column(Integer, primary_key=True)
-    account_f: AccountId = Column(Integer, ForeignKey('account.id'), nullable=False)
-    course_f: CourseId = Column(Integer, ForeignKey('course.id'), nullable=False)
+    account_f: AccountId = Column(Integer, ForeignKey("account.id"), nullable=False)
+    course_f: CourseId = Column(Integer, ForeignKey("course.id"), nullable=False)
     dropped: bool = Column(Boolean, nullable=False)
 
     account = relationship("Account")
@@ -85,10 +117,10 @@ class Student(Base):
 
 
 class SubmissionGroup(Base):
-    __tablename__ = 'submission_group'
-    
+    __tablename__ = "submission_group"
+
     id: SubmissionGroupId = Column(Integer, primary_key=True)
-    student_f: StudentId = Column(Integer, ForeignKey('student.id'), nullable=False)
+    student_f: StudentId = Column(Integer, ForeignKey("student.id"), nullable=False)
     time: str = Column(Text, nullable=False)
     deleted: bool = Column(Boolean, nullable=False)
 
@@ -96,20 +128,22 @@ class SubmissionGroup(Base):
 
 
 class Submission(Base):
-    __tablename__ = 'submission'
-    
+    __tablename__ = "submission"
+
     id: SubmissionId = Column(Integer, primary_key=True)
-    submission_location_type: BlobLocationType = Column(Enum(BlobLocationType), nullable=False)
+    submission_location_type: BlobLocationType = Column(
+        Enum(BlobLocationType), nullable=False
+    )
     submission_reference: str = Column(Text, nullable=False)
     deleted: bool = Column(Boolean, nullable=False)
 
 
 class Ta(Base):
-    __tablename__ = 'ta'
-    
+    __tablename__ = "ta"
+
     id: TaId = Column(Integer, primary_key=True)
-    account_f: AccountId = Column(Integer, ForeignKey('account.id'), nullable=False)
-    course_f: CourseId = Column(Integer, ForeignKey('course.id'), nullable=False)
+    account_f: AccountId = Column(Integer, ForeignKey("account.id"), nullable=False)
+    course_f: CourseId = Column(Integer, ForeignKey("course.id"), nullable=False)
     resigned: bool = Column(Boolean, nullable=False)
     head_ta: bool = Column(Boolean, nullable=False)
 
@@ -118,11 +152,11 @@ class Ta(Base):
 
 
 class Teacher(Base):
-    __tablename__ = 'teacher'
-    
+    __tablename__ = "teacher"
+
     id: TeacherId = Column(Integer, primary_key=True)
-    account_f: AccountId = Column(Integer, ForeignKey('account.id'), nullable=False)
-    course_f: CourseId = Column(Integer, ForeignKey('course.id'), nullable=False)
+    account_f: AccountId = Column(Integer, ForeignKey("account.id"), nullable=False)
+    course_f: CourseId = Column(Integer, ForeignKey("course.id"), nullable=False)
     resigned: bool = Column(Boolean, nullable=False)
 
     account = relationship("Account")
@@ -130,20 +164,24 @@ class Teacher(Base):
 
 
 class TestCase(Base):
-    __tablename__ = 'test_case'
-    
+    __tablename__ = "test_case"
+
     id: TestCaseId = Column(Integer, primary_key=True)
-    assignment_f: AssignmentId = Column(Integer, ForeignKey('assignment.id'), nullable=False)
+    assignment_f: AssignmentId = Column(
+        Integer, ForeignKey("assignment.id"), nullable=False
+    )
     name: str = Column(Text, nullable=False)
 
     assignment = relationship("Assignment")
 
 
 class TestToRun(Base):
-    __tablename__ = 'test_to_run'
-    
+    __tablename__ = "test_to_run"
+
     id: TestToRunId = Column(Integer, primary_key=True)
-    assignment_f: AssignmentId = Column(Integer, ForeignKey('assignment.id'), nullable=False)
+    assignment_f: AssignmentId = Column(
+        Integer, ForeignKey("assignment.id"), nullable=False
+    )
     name: str = Column(Text, nullable=False)
 
     assignment = relationship("Assignment")

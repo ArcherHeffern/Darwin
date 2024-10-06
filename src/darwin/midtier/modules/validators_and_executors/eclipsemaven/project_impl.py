@@ -1,6 +1,10 @@
 from os import symlink
 from typing import Optional
-from models.backend_models import BadConfigException, ProjectExecutionException, TestCase
+from models.backend_models import (
+    BadConfigException,
+    ProjectExecutionException,
+    TestCase,
+)
 import xml.etree.ElementTree as ET
 from subprocess import run, DEVNULL
 from pathlib import Path

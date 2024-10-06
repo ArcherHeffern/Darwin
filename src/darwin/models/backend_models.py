@@ -28,13 +28,15 @@ SubmissionGroupId = NewType("SubmissionGroupId", int)
 Account 
 ============
 """
+
+
 class Account(BaseModel):
     id: AccountId
     email: str
     name: str  # Capitalized
     hashed_password: Optional["str"]  # Null if account is inactive
     status: "AccountStatus"
-    permission: 'AccountPermission'
+    permission: "AccountPermission"
 
     class Config:
         from_attributes = True
@@ -45,6 +47,8 @@ class Account(BaseModel):
 Assignment 
 ============
 """
+
+
 class Assignment(BaseModel):
     id: AssignmentId
     course_f: CourseId
@@ -63,11 +67,14 @@ class Assignment(BaseModel):
     class Config:
         from_attributes = True
 
+
 """
 ============
 Course
 ============
 """
+
+
 class Course(BaseModel):
     id: CourseId
     name: str
@@ -82,6 +89,8 @@ class Course(BaseModel):
 GradingMetadata
 ============
 """
+
+
 class GradingMetadata(BaseModel):
     id: GradingMetadataId
     submission_f: SubmissionId
@@ -209,10 +218,12 @@ class AccountStatus(Enum):
     REQUESTED = 4
     DENIED = 5
 
+
 class AccountPermission(Enum):
     NONE = 1
     TEACHER = 2
     ADMIN = 3
+
 
 # Exceptions
 class StorageException(RuntimeError): ...

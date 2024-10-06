@@ -10,7 +10,7 @@ class AccountDal(Dal_I):
         with self.db_session() as db:
             db_account = db.query(S_Account).filter(S_Account.id == account_id).one()
             return M_Account.model_validate(db_account)
-    
+
     def get_all(self) -> list[M_Account]:
         with self.db_session() as db:
             db_accounts = db.query(S_Account).all()
@@ -23,7 +23,7 @@ class AccountDal(Dal_I):
             name=account.name,
             hashed_password=account.hashed_password,
             status=account.status,
-            permission=account.permission
+            permission=account.permission,
         )
         with self.db_session() as db:
             db.add(db_account)

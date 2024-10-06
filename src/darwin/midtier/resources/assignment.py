@@ -3,11 +3,12 @@ from darwin.midtier.services.assignment import AssignmentService
 
 
 router = APIRouter(
-    prefix='/assignment',
-    tags=['assignment'],
+    prefix="/assignment",
+    tags=["assignment"],
     responses={404: {"description": "Not found"}},
-    )
+)
 
-@router.get('/')
+
+@router.get("/")
 def get_assignments():
     return AssignmentService.get_all(), 200

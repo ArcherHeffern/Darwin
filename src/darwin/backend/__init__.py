@@ -19,8 +19,9 @@ from darwin.backend.dal.test_to_run import TestToRunDal
 # TODO: Logging system
 # TODO: Permissions table
 
+
 class _Backend:
-    DATABASE_PATH = 'db'
+    DATABASE_PATH = "db"
 
     def __init__(self):
         # Create database
@@ -38,11 +39,11 @@ class _Backend:
         self.teacher_dal = TeacherDal()
         self.test_case_dal = TestCaseDal()
         self.test_to_run_dal = TestToRunDal()
-    
+
 
 Backend: _Backend = _Backend()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # course = Course(id = CourseId(0), name = "COSI 12b", deleted = False)
     # Dal.course_dal.create(course)
     course = Backend.course_dal.get(CourseId(0))

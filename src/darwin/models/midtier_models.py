@@ -1,4 +1,3 @@
-
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
@@ -10,10 +9,11 @@ from pathlib import Path
 class Course:
     id: int
     name: str
-    teachers: list['Teacher']
-    students: list['Student']
-    head_tas: list['Ta']
-    tas: list['Ta']
+    teachers: list["Teacher"]
+    students: list["Student"]
+    head_tas: list["Ta"]
+    tas: list["Ta"]
+
 
 @dataclass
 class Assignment:
@@ -37,19 +37,22 @@ class Account:
     id: int  # Student id - Not nullable because this is known by moodle
     name: str  # Capitalized
     email: str
-    password: Optional['str'] # Null if account is inactive
-    status: 'AccountState'
+    password: Optional["str"]  # Null if account is inactive
+    status: "AccountState"
+
 
 class AccountState(Enum):
     inactive = 0
     active = 1
     deleted = 2
 
+
 @dataclass
 class Teacher:
     id: int
     account: Account
     resigned: bool
+
 
 @dataclass
 class Student:
@@ -59,10 +62,12 @@ class Student:
     dropped: bool
     submissions: list["FileSubmissionGroup"] = field(default_factory=list)
 
+
 @dataclass
 class Ta:
     id: int
     account: Account
+
 
 @dataclass
 class TestResult:

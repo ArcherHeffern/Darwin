@@ -20,7 +20,7 @@ class Dal_I(ABC):
         def get(self, *args, **kwargs):
             with self.db_session() as db:
                 ...
-        
+
         """
         db = self.__session_maker()
         try:
@@ -33,7 +33,7 @@ class Dal_I(ABC):
             db.close()
 
     @staticmethod
-    @deprecated('Use get_session instead for better type safety')
+    @deprecated("Use get_session instead for better type safety")
     def with_session(method):
         """
         Decorator to provide database session
@@ -45,6 +45,7 @@ class Dal_I(ABC):
         def get(self, db: sqlalchemy.orm.session.Session, *args, **kwargs):
             ...
         """
+
         def wrapper(self, *args, **kwargs):
             session = self.session_maker()
             try:
@@ -56,4 +57,5 @@ class Dal_I(ABC):
                 raise
             finally:
                 session.close()
+
         return wrapper

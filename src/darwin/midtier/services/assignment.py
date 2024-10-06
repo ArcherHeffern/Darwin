@@ -1,6 +1,7 @@
 from darwin.backend import Backend
 from darwin.models.backend_models import Assignment
 
+
 class AssignmentService:
 
     @staticmethod

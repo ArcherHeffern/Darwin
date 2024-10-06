@@ -1,5 +1,4 @@
 from sqlite3 import Connection
 
 
-class GradingMetadataDal:
-    ...
+class GradingMetadataDal: ...
