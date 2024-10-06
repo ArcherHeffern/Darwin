@@ -1,8 +1,8 @@
-from ..dal import Dal
+from darwin.backend import Backend
 from sqlalchemy.orm import Session
 from darwin.models.backend_models import Course as M_Course, CourseId
 
-course_dal = Dal.course_dal
+course_dal = Backend.course_dal
 
 """
 ============
@@ -10,11 +10,14 @@ Accepts Midtier model, decomposes into multiple backend models, and creates them
 ============
 """
 class CourseService:
-    def create(self, course: M_Course):
+    @staticmethod
+    def create(course: M_Course):
         course_dal.create(course)
 
-    def get_all(self) -> list[M_Course]:
+    @staticmethod
+    def get_all() -> list[M_Course]:
         return course_dal.get_all()
     
-    def get(self, id: CourseId) -> M_Course:
+    @staticmethod
+    def get(id: CourseId) -> M_Course:
         return course_dal.get(id)

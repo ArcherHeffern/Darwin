@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from src.darwin.backend import Backend
+from src.darwin.midtier.services.course import CourseService
 
 router = APIRouter(
     prefix='/course',
@@ -9,4 +9,4 @@ router = APIRouter(
 
 @router.get('/')
 def get_courses():
-    return Backend.course_service.get_all(), 200
+    return CourseService.get_all(), 200

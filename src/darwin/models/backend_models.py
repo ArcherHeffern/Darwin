@@ -32,7 +32,7 @@ class Account(BaseModel):
     id: AccountId
     email: str
     name: str  # Capitalized
-    password: Optional["str"]  # Null if account is inactive
+    hashed_password: Optional["str"]  # Null if account is inactive
     status: "AccountStatus"
     permission: 'AccountPermission'
 
