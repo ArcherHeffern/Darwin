@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 from typing import NewType
 from datetime import datetime, timedelta
 from enum import Enum
@@ -22,8 +22,7 @@ TestCaseId = NewType("TestCaseId", int)
 SubmissionGroupId = NewType("SubmissionGroupId", int)
 
 
-@dataclass
-class Account:
+class Account(BaseModel):
     id: AccountId
     email: str
     name: str  # Capitalized
@@ -31,9 +30,11 @@ class Account:
     status: "AccountStatus"
     permission: 'AccountPermission'
 
+    class Config:
+        from_attributes = True
 
-@dataclass
-class Assignment:
+
+class Assignment(BaseModel):
     id: AssignmentId
     course_f: CourseId
     name: str
@@ -48,16 +49,24 @@ class Assignment:
     last_downloaded: Optional[datetime]
     deleted: bool
 
+    class Config:
+        from_attributes = True
 
-@dataclass
-class Course:
-    id: CourseId
+class BaseCourse(BaseModel):
     name: str
+
+class CourseCreate(BaseCourse):
+    ...
+
+class Course(BaseModel):
+    id: CourseId
     deleted: bool
 
+    class Config:
+        from_attributes = True
 
-@dataclass
-class GradingMetadata:
+
+class GradingMetadata(BaseModel):
     id: GradingMetadataId
     submission_f: SubmissionId
     passing: int
@@ -68,69 +77,88 @@ class GradingMetadata:
     lateness: Optional[timedelta]  # Will be converted to Unix time
     proper_naming: bool
 
+    class Config:
+        from_attributes = True
 
-@dataclass
-class NonPassingTest:
+
+class NonPassingTest(BaseModel):
     id: NonPassingTestId
     submission_group_f: SubmissionGroupId
     test_case_f: TestCaseId
     status_f: "TestStatus"
     reason: str
 
+    class Config:
+        from_attributes = True
 
-@dataclass
-class Student:
+
+class Student(BaseModel):
     id: StudentId
     account_f: AccountId
     course_f: CourseId
     dropped: bool
 
+    class Config:
+        from_attributes = True
 
-@dataclass
-class SubmissionGroup:
+
+class SubmissionGroup(BaseModel):
     id: SubmissionGroupId
     student: StudentId
     time: datetime
     deleted: bool
 
+    class Config:
+        from_attributes = True
 
-@dataclass
-class Submission:
+
+class Submission(BaseModel):
     id: SubmissionId
     submission_location_type_f: "BlobLocationType"
     submission_reference: str
     deleted: bool
 
+    class Config:
+        from_attributes = True
 
-@dataclass
-class Ta:
+
+class Ta(BaseModel):
     id: TaId
     account: AccountId
     course_f: CourseId
     resigned: bool
     head_ta: bool
 
+    class Config:
+        from_attributes = True
 
-@dataclass
-class Teacher:
+
+class Teacher(BaseModel):
     id: TeacherId
     account_f: AccountId
     course_f: CourseId
     resigned: bool
 
+    class Config:
+        from_attributes = True
 
-@dataclass
-class TestCase:
+
+class TestCase(BaseModel):
     id: TestCaseId
     assignment_f: AssignmentId
     name: str
 
+    class Config:
+        from_attributes = True
 
-@dataclass
-class TestToRun:
+
+class TestToRun(BaseModel):
     id: TestToRunId
     assignment_f: AssignmentId
     name: str
+
+    class Config:
+        from_attributes = True
 
 
 ###########################
