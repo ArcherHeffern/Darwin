@@ -4,8 +4,8 @@ No business logic is performed
 
 # Usage
 ```python
-from backend import Backend
-from models.backend_models import Course, CourseId
+from darwin.backend import Backend
+from darwin.models.backend_models import Course, CourseId
 from uuid import uuid4
 
 course = Course(
