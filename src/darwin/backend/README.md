@@ -9,7 +9,7 @@ from models.backend_models import Course, CourseId
 from uuid import uuid4
 
 course = Course(
-    id = CourseId(uuid4), 
+    id = CourseId(uuid4()), 
     name = 'COSI 12b',
     deleted = False
 )
