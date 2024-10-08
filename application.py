@@ -7,9 +7,7 @@ from src.darwin.midtier.resources.course import router as ns3
 # from midtier.resources.course import router as ns2
 # from midtier.resources.grading import router as ns3
 
-origins = [
-    "http://localhost:3000"
-]
+origins = ["http://localhost:3000"]
 
 app = FastAPI()
 app.include_router(ns1)

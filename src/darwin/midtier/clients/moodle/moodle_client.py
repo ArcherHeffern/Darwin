@@ -3,6 +3,7 @@ from darwin.models.client_models import MoodleCourse, MoodleStudent
 import requests
 from pathlib import Path
 
+
 class MoodleClient:
 
     __course_url = "https://moodle.brandeis.edu/course/view.php?"
@@ -22,38 +23,28 @@ class MoodleClient:
         self.__cookies = {
             "MoodleSession": moodle_session,
         }
-    
-    
+
     def html_get_course(self, course_id: int) -> MoodleCourse:
         # Set moodle to show all members - DOES NOT WORK
-        params = {
-            'id': course_id,
-            'perpage': self.MAX_COURSE_SIZE
-        }
+        params = {"id": course_id, "perpage": self.MAX_COURSE_SIZE}
         r = requests.get(
             url=self.__course_users_url,
             params=params,
             headers=self.__headers,
-            cookies=self.__cookies
+            cookies=self.__cookies,
         )
 
         assert r.status_code == 200
 
         return self.__parser.html_get_course(r.text)
-        
 
     def html_get_assignment(self, assignment_id: int) -> list[MoodleStudent]:
-        params = {
-            "id": assignment_id, 
-            "tifirst": "", 
-            "tilast": "", 
-            "action": "grading"
-        }
+        params = {"id": assignment_id, "tifirst": "", "tilast": "", "action": "grading"}
         r = requests.get(
-            url=self.__assignment_url, 
+            url=self.__assignment_url,
             params=params,
-            headers=self.__headers, 
-            cookies=self.__cookies
+            headers=self.__headers,
+            cookies=self.__cookies,
         )
 
         assert r.status_code == 200
@@ -67,13 +58,15 @@ class MoodleClient:
         with open(destination, "wb") as f:
             f.write(response.content)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     import dotenv
+
     d = dotenv.dotenv_values()
-    MOODLE_SESSION = d['MOODLE_SESSION']
-    COURSE_ID = d['COURSE_ID']
+    MOODLE_SESSION = d["MOODLE_SESSION"]
+    COURSE_ID = d["COURSE_ID"]
     if not MOODLE_SESSION or not COURSE_ID:
-        raise Exception('Expected MOODLE_SESSION in .env')
+        raise Exception("Expected MOODLE_SESSION in .env")
     COURSE_ID = int(COURSE_ID)
-    
+
     print(MoodleClient(MOODLE_SESSION).html_get_course(COURSE_ID).participants)

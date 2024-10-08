@@ -5,12 +5,14 @@ from datetime import datetime
 
 class MoodleCourse(BaseModel):
     name: str
-    participants: list['MoodleCourseParticipant']
+    participants: list["MoodleCourseParticipant"]
+
 
 class MoodleCourseParticipant(BaseModel):
     id: int
     name: str
     email: str
+
 
 class MoodleCourseParticipantRole(Enum):
     STUDENT = "Student"
@@ -18,13 +20,15 @@ class MoodleCourseParticipantRole(Enum):
 
 
 class MoodleStudent(BaseModel):
-    sid: int # Moodle assigned student ID
+    sid: int  # Moodle assigned student ID
     name: str
     email: str
-    file_submissions: list['FileSubmissionGroup']
+    file_submissions: list["FileSubmissionGroup"]
+
 
 class FileSubmissionGroup(BaseModel):
-    group_of_file_submissions: list['FileSubmission']
+    group_of_file_submissions: list["FileSubmission"]
+
 
 class FileSubmission(BaseModel):
     submission_url: str

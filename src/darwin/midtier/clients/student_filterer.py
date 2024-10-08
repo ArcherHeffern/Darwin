@@ -22,11 +22,7 @@ class StudentFilterer:
 
     def __filter_first_name(self, student: MoodleStudent) -> bool:
         first_name = student.name.lower().split()[0]
-        return (
-            self.__first_name_begin
-            <= first_name
-            <= self.__first_name_end
-        )
+        return self.__first_name_begin <= first_name <= self.__first_name_end
 
     def filter_last_name(self, begin: Optional[str], end: Optional[str]) -> Self:
         if begin:
@@ -41,11 +37,7 @@ class StudentFilterer:
         if len(name_tokens) < 2:
             return False
         last_name = name_tokens[-1]
-        return (
-            self.__last_name_begin
-            <= last_name
-            <= self.__last_name_end
-        )
+        return self.__last_name_begin <= last_name <= self.__last_name_end
 
     def filter(self, students: list[MoodleStudent]) -> list[MoodleStudent]:
         filtered_students = filter(self.__filter_first_name, students)

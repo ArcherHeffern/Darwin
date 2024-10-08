@@ -1,13 +1,13 @@
 import requests
 
-token = 'TODO'
-url = 'https://moodle.brandeis.edu/webservice/rest/server.php'
+token = "TODO"
+url = "https://moodle.brandeis.edu/webservice/rest/server.php"
 
 params = {
-    'wstoken': token,
-    'wsfunction': 'core_course_get_enrolled_users_by_cmid',
-    'moodlewsrestformat': 'json',
-    'cmid': 433,  # Replace with your course module ID
+    "wstoken": token,
+    "wsfunction": "core_course_get_enrolled_users_by_cmid",
+    "moodlewsrestformat": "json",
+    "cmid": 433,  # Replace with your course module ID
 }
 
 
