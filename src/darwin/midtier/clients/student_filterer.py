@@ -1,5 +1,5 @@
 from typing import Optional, Self
-from models.backend_models import Student
+from darwin.models.client_models import MoodleStudent
 
 
 class StudentFilterer:
@@ -20,10 +20,11 @@ class StudentFilterer:
             self.__first_name_end = end.lower()
         return self
 
-    def __filter_first_name(self, student: Student) -> bool:
+    def __filter_first_name(self, student: MoodleStudent) -> bool:
+        first_name = student.name.lower().split()[0]
         return (
             self.__first_name_begin
-            <= student.name_tokens[0].lower()
+            <= first_name
             <= self.__first_name_end
         )
 
@@ -34,16 +35,19 @@ class StudentFilterer:
             self.__last_name_end = end.lower()
         return self
 
-    def __filter_last_name(self, student: Student):
+    def __filter_last_name(self, student: MoodleStudent):
         # Student does not have a last name
+        name_tokens = student.name.lower().split()
+        if len(name_tokens) < 2:
+            return False
+        last_name = name_tokens[-1]
         return (
-            len(student.name_tokens) == 1
-            or self.__last_name_begin
-            <= student.name_tokens[-1].lower()
+            self.__last_name_begin
+            <= last_name
             <= self.__last_name_end
         )
 
-    def filter(self, students: list[Student]) -> list[Student]:
+    def filter(self, students: list[MoodleStudent]) -> list[MoodleStudent]:
         filtered_students = filter(self.__filter_first_name, students)
         filtered_students = filter(self.__filter_last_name, filtered_students)
         return list(filtered_students)

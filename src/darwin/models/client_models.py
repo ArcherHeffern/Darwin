@@ -1,14 +1,31 @@
-from dataclasses import dataclass
+from enum import Enum
+from pydantic import BaseModel
+from datetime import datetime
 
 
-@dataclass
-class MoodleScrapeResults:
-    assignmentid: int
-    classid: int
-    results: list["MoodleScrapeResult"]
+class MoodleCourse(BaseModel):
+    name: str
+    participants: list['MoodleCourseParticipant']
+
+class MoodleCourseParticipant(BaseModel):
+    id: int
+    name: str
+    email: str
+
+class MoodleCourseParticipantRole(Enum):
+    STUDENT = "Student"
+    NONE = "No roles"
 
 
-@dataclass
-class MoodleScrapeResult:
-    sid: int  # Student id
-    classid: int  # Class id
+class MoodleStudent(BaseModel):
+    sid: int # Moodle assigned student ID
+    name: str
+    email: str
+    file_submissions: list['FileSubmissionGroup']
+
+class FileSubmissionGroup(BaseModel):
+    group_of_file_submissions: list['FileSubmission']
+
+class FileSubmission(BaseModel):
+    submission_url: str
+    submission_time: datetime
