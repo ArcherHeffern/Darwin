@@ -10,10 +10,13 @@ license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
 dependencies = [
-"requests==2.32.3",
-"python-dotenv==1.0.1",
-"fastapi[standard]==0.115.0",
-"SQLAlchemy==2.0.35",
+    "requests==2.32.3",
+    "python-dotenv==1.0.1",
+    "fastapi[standard]==0.115.0",
+    "SQLAlchemy==2.0.35",
+    "colorama==0.4.6",
+    "beautifulsoup4==4.12.3",
+    "lxml==5.3.0",
 ]
 
 [project.optional-dependencies]
