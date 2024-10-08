@@ -19,7 +19,7 @@ from darwin.models.backend_models import (
     TestStatus,
     TestToRunId,
 )
-from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, String, Text
+from sqlalchemy import BLOB, Boolean, Column, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 
@@ -29,7 +29,7 @@ from .db_init import Base
 class Account(Base):
     __tablename__ = "account"
 
-    id: AccountId = Column(Integer, primary_key=True)
+    id: AccountId = Column(BLOB, primary_key=True)
     email: str = Column(String, unique=True, index=True, nullable=False)
     name: str = Column(String, nullable=False)
     hashed_password: str = Column(String, nullable=True)

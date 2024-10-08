@@ -4,6 +4,7 @@ from datetime import datetime
 
 
 class MoodleCourse(BaseModel):
+    id: int
     name: str
     participants: list["MoodleCourseParticipant"]
 
@@ -12,10 +13,12 @@ class MoodleCourseParticipant(BaseModel):
     id: int
     name: str
     email: str
+    role: 'MoodleCourseParticipantRole'
 
 
 class MoodleCourseParticipantRole(Enum):
     STUDENT = "Student"
+    INSTRUCTOR = "Instructor"
     NONE = "No roles"
 
 

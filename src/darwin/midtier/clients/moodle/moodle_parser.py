@@ -1,6 +1,7 @@
 from darwin.models.client_models import (
     MoodleCourse,
     MoodleCourseParticipant,
+    MoodleCourseParticipantRole,
     MoodleStudent,
     FileSubmission,
     FileSubmissionGroup,
@@ -17,14 +18,7 @@ class MoodleHTMLParser:
 
     class MoodleHTMLParseError(RuntimeError): ...
 
-    def ajax_get_course(self, text: str) -> MoodleCourse:
-        id: int = 0
-        name: str = ""
-        email: str = ""
-        print(text)
-        return MoodleCourse(name="", participants=[])
-
-    def html_get_course(self, html: str) -> MoodleCourse:
+    def html_get_course(self, course_id: int, html: str) -> MoodleCourse:
         soup = BeautifulSoup(html, features="lxml")
         course_name_n = soup.find("h2")
         if not course_name_n:
@@ -43,12 +37,12 @@ class MoodleHTMLParser:
             id: int
             name: str
             email: str
+            role: MoodleCourseParticipantRole
 
             try:
                 id = int(participant_node.td.label["for"].removeprefix("user"))
             except:
-                print(participant_node)
-                exit()
+                raise self.MoodleHTMLParseError(f'Failed to parse userId: {participant_node}')
             name_tag = participant_node.find(class_="cell c1").a
             if (span_tag := name_tag.find("span")) is not None:
                 name = "".join(name_tag.stripped_strings).replace(span_tag.text, "")
@@ -56,15 +50,21 @@ class MoodleHTMLParser:
                 name = name_tag.text
 
             email = participant_node.find(class_="cell c2").text
+            try:
+                role_str = participant_node.find("a", class_="quickeditlink aalink").text.strip()
+                role = MoodleCourseParticipantRole(role_str)
+            except ValueError:
+                self.MoodleHTMLParseError(f"Expected variant of enum MoodleCourseParticipantRole but found '{role_str}")
             participants.append(
                 MoodleCourseParticipant(
                     id=id,
                     name=name,
                     email=email,
+                    role=role,
                 )
             )
 
-        return MoodleCourse(name=course_name, participants=participants)
+        return MoodleCourse(id=course_id, name=course_name, participants=participants)
 
     def html_get_assignment_submissions(self, html: str) -> list[MoodleStudent]:
         soup = BeautifulSoup(html, features="lxml")

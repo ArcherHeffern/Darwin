@@ -26,7 +26,7 @@ class MoodleClient:
 
     def html_get_course(self, course_id: int) -> MoodleCourse:
         # Set moodle to show all members - DOES NOT WORK
-        params = {"id": course_id, "perpage": self.MAX_COURSE_SIZE}
+        params = {"id": course_id, "perpage": self.MAX_COURSE_SIZE, "tifirst": "", "tilast": ""}
         r = requests.get(
             url=self.__course_users_url,
             params=params,
@@ -36,7 +36,7 @@ class MoodleClient:
 
         assert r.status_code == 200
 
-        return self.__parser.html_get_course(r.text)
+        return self.__parser.html_get_course(course_id, r.text)
 
     def html_get_assignment(self, assignment_id: int) -> list[MoodleStudent]:
         params = {"id": assignment_id, "tifirst": "", "tilast": "", "action": "grading"}
@@ -69,4 +69,4 @@ if __name__ == "__main__":
         raise Exception("Expected MOODLE_SESSION in .env")
     COURSE_ID = int(COURSE_ID)
 
-    print(MoodleClient(MOODLE_SESSION).html_get_course(COURSE_ID).participants)
+    print(len(MoodleClient(MOODLE_SESSION).html_get_course(COURSE_ID).participants))

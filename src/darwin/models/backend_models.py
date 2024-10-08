@@ -12,7 +12,7 @@ IDs
 CourseId = NewType("CourseId", int)
 AssignmentId = NewType("AssignmentId", int)
 TestToRunId = NewType("TestToRunId", int)
-AccountId = NewType("AccountId", int)
+AccountId = NewType("AccountId", bytes)
 TeacherId = NewType("TeacherId", int)
 TaId = NewType("TaId", int)
 StudentId = NewType("StudentId", int)
@@ -149,7 +149,7 @@ class Submission(BaseModel):
 
 class Ta(BaseModel):
     id: TaId
-    account: AccountId
+    account_f: AccountId
     course_f: CourseId
     resigned: bool
     head_ta: bool

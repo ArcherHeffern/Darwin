@@ -17,15 +17,40 @@ class AccountDal(Dal_I):
             return [M_Account.model_validate(db_account) for db_account in db_accounts]
 
     def create(self, account: M_Account):
-        db_account = S_Account(
-            id=account.id,
-            email=account.email,
-            name=account.name,
-            hashed_password=account.hashed_password,
-            status=account.status,
-            permission=account.permission,
-        )
+        """
+        Raises IntegrityError on failure
+        """
+        self.create_all([account])
+    
+    def create_all(self, accounts: list[M_Account]):
+        """
+        Atomic: Creates all or none
+
+        Raises IntegrityError on failure
+        """
+        db_accounts: list[S_Account] = []
+        for account in accounts:
+            db_account = S_Account(
+                id=account.id,
+                email=account.email,
+                name=account.name,
+                hashed_password=account.hashed_password,
+                status=account.status,
+                permission=account.permission,
+            )
+            db_accounts.append(db_account)
         with self.db_session() as db:
-            db.add(db_account)
+            db.add_all(db_accounts)
             db.commit()
-            db.refresh(db_account)
+    
+    def try_create_all(self, accounts: list[M_Account]):
+        """
+        Creates as many accounts as possible
+        
+        Does NOT raise errors on insertion error
+        """
+        for account in accounts:
+            try:
+                self.create(account)
+            except:
+                ...
