@@ -56,7 +56,7 @@ class MockData:
 
         # Account 4
         TEACHER_ACCOUNT_1 = Account(
-                id=AccountId("845hwg8dskld)"),
+                id=AccountId("845hwg8dskld"),
                 email="l@l",
                 name="Liuba",
                 hashed_password=None,
