@@ -24,8 +24,7 @@ class MoodleClient:
             "MoodleSession": moodle_session,
         }
 
-    def html_get_course(self, course_id: int) -> MoodleCourse:
-        # Set moodle to show all members - DOES NOT WORK
+    def html_get_course(self, course_id: str) -> MoodleCourse:
         params = {"id": course_id, "perpage": self.MAX_COURSE_SIZE, "tifirst": "", "tilast": ""}
         r = requests.get(
             url=self.__course_users_url,
@@ -67,6 +66,5 @@ if __name__ == "__main__":
     COURSE_ID = d["COURSE_ID"]
     if not MOODLE_SESSION or not COURSE_ID:
         raise Exception("Expected MOODLE_SESSION in .env")
-    COURSE_ID = int(COURSE_ID)
 
     print(len(MoodleClient(MOODLE_SESSION).html_get_course(COURSE_ID).participants))

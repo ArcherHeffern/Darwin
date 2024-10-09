@@ -4,13 +4,13 @@ from datetime import datetime
 
 
 class MoodleCourse(BaseModel):
-    id: int
+    id: str
     name: str
     participants: list["MoodleCourseParticipant"]
 
 
 class MoodleCourseParticipant(BaseModel):
-    id: int
+    id: str
     name: str
     email: str
     role: 'MoodleCourseParticipantRole'
@@ -23,7 +23,7 @@ class MoodleCourseParticipantRole(Enum):
 
 
 class MoodleStudent(BaseModel):
-    sid: int  # Moodle assigned student ID
+    sid: str  # Moodle assigned student ID
     name: str
     email: str
     file_submissions: list["FileSubmissionGroup"]

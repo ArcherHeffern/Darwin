@@ -1,3 +1,7 @@
+# Mental Cache
+Convert ids to string for better readability
+Find the shape of the data returned from my function
+
 # TODO
 - Ensure all projects are eclipse projects
 - Rename to prevent name conflicts and set naming flag
@@ -17,12 +21,3 @@
 - TA pinging system
 
 # Blockers
-Data models that may be based on data from another source with its own ID
-Linking accounts that were created
-Authentication + Protected routes
-How to break up mid tier API
-
-Doing rn: 
-- Teacher Sign up
-- Sending confirmation email once teacher is accepted
-- Moodle login? 

@@ -9,18 +9,18 @@ from typing import Optional
 IDs
 ============
 """
-CourseId = NewType("CourseId", int)
-AssignmentId = NewType("AssignmentId", int)
-TestToRunId = NewType("TestToRunId", int)
-AccountId = NewType("AccountId", bytes)
-TeacherId = NewType("TeacherId", int)
-TaId = NewType("TaId", int)
-StudentId = NewType("StudentId", int)
-SubmissionId = NewType("SubmissionId", int)
-GradingMetadataId = NewType("GradingMetadataId", int)
-NonPassingTestId = NewType("NonPassingTestId", int)
-TestCaseId = NewType("TestCaseId", int)
-SubmissionGroupId = NewType("SubmissionGroupId", int)
+CourseId = NewType("CourseId", str)
+AssignmentId = NewType("AssignmentId", str)
+TestToRunId = NewType("TestToRunId", str)
+AccountId = NewType("AccountId", str)
+TeacherId = NewType("TeacherId", str)
+TaId = NewType("TaId", str)
+StudentId = NewType("StudentId", str)
+SubmissionId = NewType("SubmissionId", str)
+GradingMetadataId = NewType("GradingMetadataId", str)
+NonPassingTestId = NewType("NonPassingTestId", str)
+TestCaseId = NewType("TestCaseId", str)
+SubmissionGroupId = NewType("SubmissionGroupId", str)
 
 
 """

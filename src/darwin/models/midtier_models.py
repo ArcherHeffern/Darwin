@@ -1,10 +1,8 @@
+from re import I
 from pydantic import BaseModel
+from datetime import datetime
 from typing import NewType, Optional
-
-# ================
-# Ids
-# ================
-CourseId = NewType("CourseId", int)
+from darwin.models.backend_models import AccountId, TaId, CourseId, StudentId, TeacherId, TestCaseId, TestToRunId, AssignmentId, SubmissionId, NonPassingTestId, GradingMetadataId, SubmissionGroupId
 
 # ================
 # Course
@@ -14,17 +12,24 @@ class BaseCourse(BaseModel):
 
 
 class MoodleCourseCreate(BaseCourse):
-    course_id: int
+    id: CourseId
     moodle_session: str
 
 class NormalCourseCreate(BaseCourse):
-    id: Optional[int]
+    id: Optional[CourseId]
     name: str
 
-class CourseGetBasic(BaseCourse):
-    id: Optional[int]
+class BasicCourse(BaseCourse):
+    id: CourseId
+    name: str
+
+class Course(BaseCourse):
+    id: CourseId
     name: str
     teachers: list["Teacher"]
+    students: list["Student"]
+    tas: list["Ta"]
+    assignments: list["BasicAssignment"]
 
 
 # class CourseGetExtended(BaseCourse):
@@ -38,7 +43,7 @@ class CourseGetBasic(BaseCourse):
 # Teacher
 # ================
 class BaseTeacher(BaseModel):
-    id: int
+    id: TeacherId
     name: str
     email: str
 
@@ -53,31 +58,35 @@ class Teacher(BaseTeacher): ...
 # TA
 # ================
 class BaseTa(BaseModel):
-    id: int
+    id: TaId
     name: str
     email: str
 
 
-class TaGet(BaseModel): ...
+class Ta(BaseTa): ...
 
 
 # ================
 # Student
 # ================
 class BaseStudent(BaseModel):
-    id: int
+    id: StudentId
     name: str
     email: str
 
 
-class StudentGet(BaseStudent): ...
+class Student(BaseStudent): ...
 
 
 # ================
 # Assignment
 # ================
 class BaseAssignment(BaseModel):
-    id: int
+    id: AssignmentId
+
+class BasicAssignment(BaseAssignment):
+    name: str
+    due_date: datetime
 
 
 # class Assignment(BaseModel):

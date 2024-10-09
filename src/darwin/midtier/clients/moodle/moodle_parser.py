@@ -18,12 +18,12 @@ class MoodleHTMLParser:
 
     class MoodleHTMLParseError(RuntimeError): ...
 
-    def html_get_course(self, course_id: int, html: str) -> MoodleCourse:
+    def html_get_course(self, course_id: str, html: str) -> MoodleCourse:
         soup = BeautifulSoup(html, features="lxml")
         course_name_n = soup.find("h2")
         if not course_name_n:
             raise self.MoodleHTMLParseError("Could not parse course name")
-        course_name = course_name_n.text
+        course_name = course_name_n.text.strip()
         participants: list[MoodleCourseParticipant] = []
 
         participant_table = soup.findAll("tbody", limit=2)[1]
@@ -34,13 +34,13 @@ class MoodleHTMLParser:
         for participant_node in participant_nodes:
             if participant_node["class"] == ["emptyrow"]:
                 continue
-            id: int
+            id: str
             name: str
             email: str
             role: MoodleCourseParticipantRole
 
             try:
-                id = int(participant_node.td.label["for"].removeprefix("user"))
+                id = participant_node.td.label["for"].removeprefix("user")
             except:
                 raise self.MoodleHTMLParseError(f'Failed to parse userId: {participant_node}')
             name_tag = participant_node.find(class_="cell c1").a
@@ -74,7 +74,7 @@ class MoodleHTMLParser:
         students: list[MoodleStudent] = []
 
         for submission in submissions:
-            sid: int
+            sid: str
             name: str
             email: str
             file_submissions: list[FileSubmissionGroup]

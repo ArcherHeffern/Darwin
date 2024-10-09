@@ -29,7 +29,7 @@ def moodle_course_to_BE_course(
     teachers: list[BE_Teacher] = []
 
     for participant in moodle_course.participants:
-        account_id = BE_AccountId(uuid4().bytes)
+        account_id = BE_AccountId(str(uuid4()))
         account: BE_Account = BE_Account(
             id=account_id,
             email=participant.email,

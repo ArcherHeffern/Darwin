@@ -19,7 +19,7 @@ from darwin.models.backend_models import (
     TestStatus,
     TestToRunId,
 )
-from sqlalchemy import BLOB, Boolean, Column, Enum, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 
@@ -29,7 +29,7 @@ from .db_init import Base
 class Account(Base):
     __tablename__ = "account"
 
-    id: AccountId = Column(BLOB, primary_key=True)
+    id: AccountId = Column(String, primary_key=True)
     email: str = Column(String, unique=True, index=True, nullable=False)
     name: str = Column(String, nullable=False)
     hashed_password: str = Column(String, nullable=True)
@@ -40,8 +40,8 @@ class Account(Base):
 class Assignment(Base):
     __tablename__ = "assignment"
 
-    id: AssignmentId = Column(Integer, primary_key=True)
-    course_f: CourseId = Column(Integer, ForeignKey("course.id"), nullable=False)
+    id: AssignmentId = Column(String, primary_key=True)
+    course_f: CourseId = Column(String, ForeignKey("course.id"), nullable=False)
     name: str = Column(Text, nullable=False)
     due_date: str = Column(Text, nullable=False)
     project_type: ProjectType = Column(Enum(ProjectType), nullable=False)
@@ -64,7 +64,7 @@ class Assignment(Base):
 class Course(Base):
     __tablename__ = "course"
 
-    id: int = Column(Integer, primary_key=True)
+    id: int = Column(String, primary_key=True)
     name: str = Column(Text, nullable=False)
     deleted: bool = Column(Boolean, nullable=False)
 
@@ -72,9 +72,9 @@ class Course(Base):
 class GradingMetadata(Base):
     __tablename__ = "grading_metadata"
 
-    id: GradingMetadataId = Column(Integer, primary_key=True)
+    id: GradingMetadataId = Column(String, primary_key=True)
     submission_f: SubmissionId = Column(
-        Integer, ForeignKey("submission.id"), nullable=False
+        String, ForeignKey("submission.id"), nullable=False
     )
     passing: int = Column(Integer, nullable=False, default=0)
     failing: int = Column(Integer, nullable=False, default=0)
@@ -90,12 +90,12 @@ class GradingMetadata(Base):
 class NonPassingTest(Base):
     __tablename__ = "non_passing_test"
 
-    id: NonPassingTestId = Column(Integer, primary_key=True)
+    id: NonPassingTestId = Column(String, primary_key=True)
     submission_group_f: SubmissionGroupId = Column(
-        Integer, ForeignKey("submission_group.id"), nullable=False
+        String, ForeignKey("submission_group.id"), nullable=False
     )
     test_case_f: TestCaseId = Column(
-        Integer, ForeignKey("test_case.id"), nullable=False
+        String, ForeignKey("test_case.id"), nullable=False
     )
     status_f: TestStatus = Column(Enum(TestStatus), nullable=False)
     reason: str = Column(Text, nullable=False)
@@ -107,9 +107,9 @@ class NonPassingTest(Base):
 class Student(Base):
     __tablename__ = "student"
 
-    id: StudentId = Column(Integer, primary_key=True)
-    account_f: AccountId = Column(Integer, ForeignKey("account.id"), nullable=False)
-    course_f: CourseId = Column(Integer, ForeignKey("course.id"), nullable=False)
+    id: StudentId = Column(String, primary_key=True)
+    account_f: AccountId = Column(String, ForeignKey("account.id"), nullable=False)
+    course_f: CourseId = Column(String, ForeignKey("course.id"), nullable=False)
     dropped: bool = Column(Boolean, nullable=False)
 
     account = relationship("Account")
@@ -119,8 +119,8 @@ class Student(Base):
 class SubmissionGroup(Base):
     __tablename__ = "submission_group"
 
-    id: SubmissionGroupId = Column(Integer, primary_key=True)
-    student_f: StudentId = Column(Integer, ForeignKey("student.id"), nullable=False)
+    id: SubmissionGroupId = Column(String, primary_key=True)
+    student_f: StudentId = Column(String, ForeignKey("student.id"), nullable=False)
     time: str = Column(Text, nullable=False)
     deleted: bool = Column(Boolean, nullable=False)
 
@@ -130,7 +130,7 @@ class SubmissionGroup(Base):
 class Submission(Base):
     __tablename__ = "submission"
 
-    id: SubmissionId = Column(Integer, primary_key=True)
+    id: SubmissionId = Column(String, primary_key=True)
     submission_location_type: BlobLocationType = Column(
         Enum(BlobLocationType), nullable=False
     )
@@ -141,9 +141,9 @@ class Submission(Base):
 class Ta(Base):
     __tablename__ = "ta"
 
-    id: TaId = Column(Integer, primary_key=True)
-    account_f: AccountId = Column(Integer, ForeignKey("account.id"), nullable=False)
-    course_f: CourseId = Column(Integer, ForeignKey("course.id"), nullable=False)
+    id: TaId = Column(String, primary_key=True)
+    account_f: AccountId = Column(String, ForeignKey("account.id"), nullable=False)
+    course_f: CourseId = Column(String, ForeignKey("course.id"), nullable=False)
     resigned: bool = Column(Boolean, nullable=False)
     head_ta: bool = Column(Boolean, nullable=False)
 
@@ -154,9 +154,9 @@ class Ta(Base):
 class Teacher(Base):
     __tablename__ = "teacher"
 
-    id: TeacherId = Column(Integer, primary_key=True)
-    account_f: AccountId = Column(Integer, ForeignKey("account.id"), nullable=False)
-    course_f: CourseId = Column(Integer, ForeignKey("course.id"), nullable=False)
+    id: TeacherId = Column(String, primary_key=True)
+    account_f: AccountId = Column(String, ForeignKey("account.id"), nullable=False)
+    course_f: CourseId = Column(String, ForeignKey("course.id"), nullable=False)
     resigned: bool = Column(Boolean, nullable=False)
 
     account = relationship("Account")
@@ -166,9 +166,9 @@ class Teacher(Base):
 class TestCase(Base):
     __tablename__ = "test_case"
 
-    id: TestCaseId = Column(Integer, primary_key=True)
+    id: TestCaseId = Column(String, primary_key=True)
     assignment_f: AssignmentId = Column(
-        Integer, ForeignKey("assignment.id"), nullable=False
+        String, ForeignKey("assignment.id"), nullable=False
     )
     name: str = Column(Text, nullable=False)
 
@@ -178,9 +178,9 @@ class TestCase(Base):
 class TestToRun(Base):
     __tablename__ = "test_to_run"
 
-    id: TestToRunId = Column(Integer, primary_key=True)
+    id: TestToRunId = Column(String, primary_key=True)
     assignment_f: AssignmentId = Column(
-        Integer, ForeignKey("assignment.id"), nullable=False
+        String, ForeignKey("assignment.id"), nullable=False
     )
     name: str = Column(Text, nullable=False)
 

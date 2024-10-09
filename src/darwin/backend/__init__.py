@@ -13,6 +13,7 @@ from darwin.backend.dal.teacher_course import TeacherCourseDal
 from darwin.backend.dal.teacher import TeacherDal
 from darwin.backend.dal.test_case import TestCaseDal
 from darwin.backend.dal.test_to_run import TestToRunDal
+from config import Config
 
 # TODO: Grading config used by assignment for grading
 # TODO: Notification system
@@ -21,8 +22,6 @@ from darwin.backend.dal.test_to_run import TestToRunDal
 
 
 class _Backend:
-    DATABASE_PATH = "db"
-
     def __init__(self):
         # Create database
         schemas.Base.metadata.create_all(bind=engine)
@@ -43,9 +42,11 @@ class _Backend:
 
 Backend: _Backend = _Backend()
 
+if Config.DB_DATA:
+    from darwin.backend.mock_data import MockData
+    MockData.create()
+
 if __name__ == "__main__":
-    # course = Course(id = CourseId(0), name = "COSI 12b", deleted = False)
-    # Dal.course_dal.create(course)
-    course = Backend.course_dal.get(CourseId(0))
+    course = Backend.course_dal.get(CourseId("0"))
     courses = Backend.course_dal.get_all()
     print([course.name for course in courses])
