@@ -1,6 +1,4 @@
 # Mental Cache
-Convert ids to string for better readability
-Find the shape of the data returned from my function
 
 # TODO
 - Ensure all projects are eclipse projects
@@ -25,3 +23,5 @@ How to approach projections and joins regarding Midtier and Backend Responsibili
 
 Lets say I want to get all students with their names. 
 - Create backend endpoint that does the join for me
+- How to handle user authentication
+- To create my midtier models - Should I a. do API requests in a formatter, only pass data into or b. make requests to another service

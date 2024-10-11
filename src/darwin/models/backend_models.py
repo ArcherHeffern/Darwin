@@ -54,12 +54,12 @@ class Assignment(BaseModel):
     course_f: CourseId
     name: str
     due_date: datetime
-    project_type_f: "ProjectType"
+    project_type: "ProjectType"
     source_type: "SourceType"
     source_reference: str
-    assignment_stub_location_type_f: "BlobLocationType"
+    assignment_stub_location_type: "BlobLocationType"
     assignment_stub_reference: str
-    assignment_testfiles_location_type_f: "BlobLocationType"
+    assignment_testfiles_location_type: "BlobLocationType"
     assignment_testfiles_reference: str
     last_downloaded: Optional[datetime]
     deleted: bool

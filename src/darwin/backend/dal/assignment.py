@@ -31,4 +31,21 @@ class AssignmentDal(Dal_I):
         assignments = query.all()
         return [M_Assignment.model_validate(assignment) for assignment in assignments]
 
-    def create(self, assignment: M_Assignment): ...
+    def create(self, assignment: M_Assignment):
+        with self.db_session() as db:
+            db_assignment = S_Assignment(
+                id=assignment.id,
+                course_f=assignment.course_f,
+                name=assignment.name,
+                due_date=assignment.due_date,
+                project_type=assignment.project_type,
+                source_type=assignment.source_type,
+                source_reference=assignment.source_reference,
+                assignment_stub_location_type=assignment.assignment_stub_location_type,
+                assignment_stub_reference=assignment.assignment_stub_reference,
+                assignment_testfiles_location_type=assignment.assignment_testfiles_location_type,
+                assignment_testfiles_reference=assignment.assignment_testfiles_reference,
+                last_downloaded=assignment.last_downloaded,
+                deleted=assignment.deleted,
+            )
+            db.add(db_assignment)

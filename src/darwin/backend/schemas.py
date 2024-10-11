@@ -19,7 +19,7 @@ from darwin.models.backend_models import (
     TestStatus,
     TestToRunId,
 )
-from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 
@@ -43,7 +43,7 @@ class Assignment(Base):
     id: AssignmentId = Column(String, primary_key=True)
     course_f: CourseId = Column(String, ForeignKey("course.id"), nullable=False)
     name: str = Column(Text, nullable=False)
-    due_date: str = Column(Text, nullable=False)
+    due_date: str = Column(DateTime, nullable=False)
     project_type: ProjectType = Column(Enum(ProjectType), nullable=False)
     source_type: SourceType = Column(Enum(SourceType), nullable=False)
     source_reference: str = Column(Text, nullable=False)
@@ -55,7 +55,7 @@ class Assignment(Base):
         Enum(BlobLocationType), nullable=True
     )
     assignment_testfiles_reference: str = Column(Text, nullable=False)
-    last_downloaded: str = Column(Text, nullable=True)
+    last_downloaded: str = Column(DateTime, nullable=True)
     deleted: bool = Column(Boolean, nullable=False, default=False)
 
     course = relationship("Course")
