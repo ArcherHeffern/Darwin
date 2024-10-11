@@ -94,9 +94,7 @@ class NonPassingTest(Base):
     submission_group_f: SubmissionGroupId = Column(
         String, ForeignKey("submission_group.id"), nullable=False
     )
-    test_case_f: TestCaseId = Column(
-        String, ForeignKey("test_case.id"), nullable=False
-    )
+    test_case_f: TestCaseId = Column(String, ForeignKey("test_case.id"), nullable=False)
     status_f: TestStatus = Column(Enum(TestStatus), nullable=False)
     reason: str = Column(Text, nullable=False)
 

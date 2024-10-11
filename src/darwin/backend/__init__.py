@@ -44,6 +44,7 @@ Backend: _Backend = _Backend()
 
 if Config.DB_DATA:
     from darwin.backend.mock_data import MockData
+
     MockData.create()
 
 if __name__ == "__main__":

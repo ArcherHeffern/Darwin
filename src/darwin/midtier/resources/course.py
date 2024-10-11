@@ -1,6 +1,13 @@
 from fastapi import APIRouter, HTTPException
 from darwin.midtier.services.course import CourseService
-from darwin.models.midtier_models import BasicAssignment, MoodleCourseCreate, Course, BasicCourse, AccountId
+from darwin.models.midtier_models import (
+    BasicAssignment,
+    MoodleCourseCreate,
+    Course,
+    BasicCourse,
+    AccountId,
+    CourseId,
+)
 from darwin.midtier.clients.moodle.moodle_client import MoodleClient
 from darwin.models.client_models import MoodleCourse
 import darwin.midtier.services.moodle_course_service as MoodleCourseService
@@ -17,6 +24,11 @@ def get_all(account_id: AccountId) -> list[BasicCourse]:
     return CourseService.get_all_basic(account_id)
 
 
+@router.get("/{course_id}")
+def get(course_id: CourseId) -> Course:
+    return CourseService.get(course_id)
+
+
 @router.post("/moodle", status_code=201)
 def createMoodle(moodle_course_create: MoodleCourseCreate) -> Course:
     moodle_course: MoodleCourse = MoodleClient(
@@ -26,4 +38,3 @@ def createMoodle(moodle_course_create: MoodleCourseCreate) -> Course:
         return MoodleCourseService.create(moodle_course)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-

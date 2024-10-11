@@ -21,3 +21,7 @@ Find the shape of the data returned from my function
 - TA pinging system
 
 # Blockers
+How to approach projections and joins regarding Midtier and Backend Responsibility
+
+Lets say I want to get all students with their names. 
+- Create backend endpoint that does the join for me

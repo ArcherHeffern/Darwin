@@ -25,7 +25,12 @@ class MoodleClient:
         }
 
     def html_get_course(self, course_id: str) -> MoodleCourse:
-        params = {"id": course_id, "perpage": self.MAX_COURSE_SIZE, "tifirst": "", "tilast": ""}
+        params = {
+            "id": course_id,
+            "perpage": self.MAX_COURSE_SIZE,
+            "tifirst": "",
+            "tilast": "",
+        }
         r = requests.get(
             url=self.__course_users_url,
             params=params,

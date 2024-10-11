@@ -68,7 +68,7 @@ def moodle_course_to_BE_course(
                         account_f=account_id,
                         course_f=course_id,
                         resigned=False,
-                        head_ta = False,
+                        head_ta=False,
                     )
                 )
         accounts.append(account)

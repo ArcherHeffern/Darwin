@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Iterable, Optional
 from darwin.backend.dal.dal_I import Dal_I
 from darwin.models.backend_models import AccountId, Account as M_Account
 from darwin.backend.schemas import Account as S_Account
@@ -8,12 +8,18 @@ from sqlalchemy.orm.session import Session
 class AccountDal(Dal_I):
     def get(self, account_id: AccountId) -> M_Account:
         with self.db_session() as db:
-            db_account = db.query(S_Account).filter(S_Account.id == account_id).one()
+            db_account = db.query(S_Account).filter_by(id=account_id).one()
             return M_Account.model_validate(db_account)
 
-    def get_all(self) -> list[M_Account]:
+    def get_all(
+        self, account_ids: Optional[Iterable[AccountId]] = None
+    ) -> list[M_Account]:
         with self.db_session() as db:
-            db_accounts = db.query(S_Account).all()
+            query = db.query(S_Account)
+            if account_ids:
+                query = query.filter(S_Account.id.in_(account_ids))
+
+            db_accounts = query.all()
             return [M_Account.model_validate(db_account) for db_account in db_accounts]
 
     def create(self, account: M_Account):
@@ -21,7 +27,7 @@ class AccountDal(Dal_I):
         Raises IntegrityError on failure
         """
         self.create_all([account])
-    
+
     def create_all(self, accounts: list[M_Account]):
         """
         Atomic: Creates all or none
@@ -42,11 +48,11 @@ class AccountDal(Dal_I):
         with self.db_session() as db:
             db.add_all(db_accounts)
             db.commit()
-    
+
     def try_create_all(self, accounts: list[M_Account]):
         """
         Creates as many accounts as possible
-        
+
         Does NOT raise errors on insertion error
         """
         for account in accounts:

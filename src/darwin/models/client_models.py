@@ -13,7 +13,7 @@ class MoodleCourseParticipant(BaseModel):
     id: str
     name: str
     email: str
-    role: 'MoodleCourseParticipantRole'
+    role: "MoodleCourseParticipantRole"
 
 
 class MoodleCourseParticipantRole(Enum):

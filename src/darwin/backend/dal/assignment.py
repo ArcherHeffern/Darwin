@@ -1,34 +1,34 @@
+from typing import Optional
 from sqlalchemy.orm import Session
 
 from darwin.backend.dal.dal_I import Dal_I
-from .. import schemas
-from darwin.models.backend_models import Assignment, AssignmentId
+from darwin.backend.schemas import Assignment as S_Assignment
+from darwin.models.backend_models import (
+    Assignment as M_Assignment,
+    AssignmentId,
+    CourseId,
+)
 
 
 class AssignmentDal(Dal_I):
 
-    def get(self, id: AssignmentId, allow_deleted=False):
+    def get(self, id: AssignmentId) -> Optional[M_Assignment]:
         with self.db_session() as db:
-            if allow_deleted:
-                result = db.query(schemas.Assignment).filter(Assignment.id == id).one()
-            else:
-                result = (
-                    db.query(schemas.Assignment)
-                    .filter(Assignment.id == id and not Assignment.deleted)
-                    .one()
-                )
-        return Assignment.model_validate(result)
+            maybe_assignment = db.get(S_Assignment, id)
+            if maybe_assignment is None:
+                return None
+            return M_Assignment.model_validate(maybe_assignment)
 
-    def get_all(self, allow_deleted: bool = False) -> list[Assignment]:
+    def get_all(
+        self, course_id: Optional[CourseId] = None, hide_deleted: bool = True
+    ) -> list[M_Assignment]:
         with self.db_session() as db:
-            if allow_deleted:
-                results = db.query(schemas.Assignment).all()
-            else:
-                results = (
-                    db.query(schemas.Assignment)
-                    .filter(schemas.Assignment.deleted == False)
-                    .all()
-                )
-            return [Assignment.model_validate(result) for result in results]
+            query = db.query(S_Assignment)
+            if hide_deleted:
+                query = query.filter_by(deleted=False)
+            if course_id is not None:
+                query = query.filter_by(course_f=course_id)
+        assignments = query.all()
+        return [M_Assignment.model_validate(assignment) for assignment in assignments]
 
-    def create(self, assignment: Assignment): ...
+    def create(self, assignment: M_Assignment): ...

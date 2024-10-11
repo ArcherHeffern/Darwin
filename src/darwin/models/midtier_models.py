@@ -2,33 +2,49 @@ from re import I
 from pydantic import BaseModel
 from datetime import datetime
 from typing import NewType, Optional
-from darwin.models.backend_models import AccountId, TaId, CourseId, StudentId, TeacherId, TestCaseId, TestToRunId, AssignmentId, SubmissionId, NonPassingTestId, GradingMetadataId, SubmissionGroupId
+from darwin.models.backend_models import (
+    AccountId,
+    TaId,
+    CourseId,
+    StudentId,
+    TeacherId,
+    TestCaseId,
+    TestToRunId,
+    AssignmentId,
+    SubmissionId,
+    NonPassingTestId,
+    GradingMetadataId,
+    SubmissionGroupId,
+)
+
 
 # ================
 # Course
 # ================
-class BaseCourse(BaseModel):
-    ...
+class BaseCourse(BaseModel): ...
 
 
 class MoodleCourseCreate(BaseCourse):
     id: CourseId
     moodle_session: str
 
+
 class NormalCourseCreate(BaseCourse):
     id: Optional[CourseId]
     name: str
+
 
 class BasicCourse(BaseCourse):
     id: CourseId
     name: str
 
+
 class Course(BaseCourse):
     id: CourseId
     name: str
     teachers: list["Teacher"]
-    students: list["Student"]
     tas: list["Ta"]
+    students: list["Student"]
     assignments: list["BasicAssignment"]
 
 
@@ -83,6 +99,7 @@ class Student(BaseStudent): ...
 # ================
 class BaseAssignment(BaseModel):
     id: AssignmentId
+
 
 class BasicAssignment(BaseAssignment):
     name: str

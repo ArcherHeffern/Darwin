@@ -42,7 +42,9 @@ class MoodleHTMLParser:
             try:
                 id = participant_node.td.label["for"].removeprefix("user")
             except:
-                raise self.MoodleHTMLParseError(f'Failed to parse userId: {participant_node}')
+                raise self.MoodleHTMLParseError(
+                    f"Failed to parse userId: {participant_node}"
+                )
             name_tag = participant_node.find(class_="cell c1").a
             if (span_tag := name_tag.find("span")) is not None:
                 name = "".join(name_tag.stripped_strings).replace(span_tag.text, "")
@@ -51,10 +53,14 @@ class MoodleHTMLParser:
 
             email = participant_node.find(class_="cell c2").text
             try:
-                role_str = participant_node.find("a", class_="quickeditlink aalink").text.strip()
+                role_str = participant_node.find(
+                    "a", class_="quickeditlink aalink"
+                ).text.strip()
                 role = MoodleCourseParticipantRole(role_str)
             except ValueError:
-                self.MoodleHTMLParseError(f"Expected variant of enum MoodleCourseParticipantRole but found '{role_str}")
+                self.MoodleHTMLParseError(
+                    f"Expected variant of enum MoodleCourseParticipantRole but found '{role_str}"
+                )
             participants.append(
                 MoodleCourseParticipant(
                     id=id,
