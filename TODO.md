@@ -1,4 +1,5 @@
 # Mental Cache
+Transition all create methods to return None on error
 
 # TODO
 - Ensure all projects are eclipse projects

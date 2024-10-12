@@ -1,12 +1,8 @@
 from datetime import datetime
 from darwin.models.backend_models import (
-    Account,
-    AccountId,
-    AccountPermission,
-    AccountStatus,
     Assignment,
+    BlobId,
     AssignmentId,
-    BlobLocationType,
     CourseId,
     ProjectType,
     SourceType,
@@ -28,10 +24,8 @@ class AssignmentTests(TestCase):
             project_type=ProjectType.MAVEN,
             source_type=SourceType.MOODLE,
             source_reference="",
-            assignment_stub_location_type=BlobLocationType.DISK,
-            assignment_stub_reference="/home/moodle/assignment10",
-            assignment_testfiles_location_type=BlobLocationType.DISK,
-            assignment_testfiles_reference="/home/testfiles/assignment1",
+            skeleton_f=BlobId("skeleton"),
+            testfiles_f=BlobId("testfiles"),
             last_downloaded=datetime(2024, 12, 10, 12, 55),
             deleted=False,
         )

@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import HTTPException
 from darwin.backend import Backend
 from darwin.models.midtier_models import (
@@ -10,6 +11,7 @@ from darwin.models.midtier_models import (
     Teacher,
 )
 from darwin.models.backend_models import Course as BE_Course, AccountId
+from darwin.midtier.formatters.BE_assignment_to_basic_assignment import BE_assignment_to_basic_assignment
 from itertools import chain
 
 course_dal = Backend.course_dal
@@ -31,8 +33,16 @@ class CourseService:
     # def create(course: M_Course) -> MT_Course:
     #     course_dal.create(course)
 
+    @classmethod
+    def get_all_basic(cls, account_id: Optional[AccountId] = None) -> list[MT_BasicCourse]:
+        if account_id is None:
+            BE_courses: list[BE_Course] = course_dal.get_all()
+            return [MT_BasicCourse(id=c.id, name=c.name) for c in BE_courses]
+        else:
+            return cls.__get_all_by_account_id(account_id)
+    
     @staticmethod
-    def get_all_basic(account_id: AccountId) -> list[MT_BasicCourse]:
+    def __get_all_by_account_id(account_id: AccountId) -> list[MT_BasicCourse]:
         student_courses: list[BE_Course] = course_dal.get_student_courses_by_account(
             account_id
         )
@@ -87,6 +97,8 @@ class CourseService:
             student = Student(id=BE_student.id, name=account.name, email=account.email)
             students.append(student)
 
+        assignments = [BE_assignment_to_basic_assignment(BE_assignment) for BE_assignment in BE_assignments]
+
         return MT_Course(
             id=BE_course.id,
             name=BE_course.name,
@@ -95,7 +107,6 @@ class CourseService:
             students=students,
             assignments=assignments,
         )
-        # get students, tas, teachers, and assignments
 
 
 if __name__ == "__main__":

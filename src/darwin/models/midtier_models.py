@@ -1,10 +1,10 @@
-from re import I
 from pydantic import BaseModel
 from datetime import datetime
 from typing import NewType, Optional
 from darwin.models.backend_models import (
     AccountId,
     TaId,
+    BlobId,
     CourseId,
     StudentId,
     TeacherId,
@@ -15,6 +15,8 @@ from darwin.models.backend_models import (
     NonPassingTestId,
     GradingMetadataId,
     SubmissionGroupId,
+    ProjectType,
+    SourceType,
 )
 
 
@@ -98,27 +100,36 @@ class Student(BaseStudent): ...
 # Assignment
 # ================
 class BaseAssignment(BaseModel):
-    id: AssignmentId
+    ...
 
 
 class BasicAssignment(BaseAssignment):
+    id: AssignmentId
     name: str
     due_date: datetime
 
+class Assignment(BaseAssignment):
+    id: AssignmentId
+    course_f: CourseId
+    name: str
+    due_date: datetime
+    project_type: "ProjectType"
+    source_type: "SourceType"
+    source_reference: Optional[str]
+    skeleton_f: Optional[BlobId]
+    testfiles_f: BlobId
+    last_downloaded: Optional[datetime]
 
-# class Assignment(BaseModel):
-#     id: Optional[int]
-#     name: str
-#     due_date: datetime
-#     source: Literal["moodle"]
-#     project_type: Literal["maven"]
-#     tests_to_run: list[str]
-
-#     metadata: "AssignmentMetadata"
-
-
-# class AssignmentMetadata:
-#     last_downloaded: Optional[datetime]
+class CreateAssignment(BaseAssignment):
+    id: Optional[AssignmentId]
+    course_f: CourseId
+    name: str
+    due_date: datetime
+    project_type: "ProjectType"
+    source_type: "SourceType"
+    source_reference: Optional[str]
+    skeleton_f: Optional[BlobId]
+    testfiles_f: BlobId
 
 
 # @dataclass

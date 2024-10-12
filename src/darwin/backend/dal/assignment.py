@@ -12,9 +12,9 @@ from darwin.models.backend_models import (
 
 class AssignmentDal(Dal_I):
 
-    def get(self, id: AssignmentId) -> Optional[M_Assignment]:
+    def get(self, assignment_id: AssignmentId) -> Optional[M_Assignment]:
         with self.db_session() as db:
-            maybe_assignment = db.get(S_Assignment, id)
+            maybe_assignment = db.get(S_Assignment, assignment_id)
             if maybe_assignment is None:
                 return None
             return M_Assignment.model_validate(maybe_assignment)
@@ -41,10 +41,8 @@ class AssignmentDal(Dal_I):
                 project_type=assignment.project_type,
                 source_type=assignment.source_type,
                 source_reference=assignment.source_reference,
-                assignment_stub_location_type=assignment.assignment_stub_location_type,
-                assignment_stub_reference=assignment.assignment_stub_reference,
-                assignment_testfiles_location_type=assignment.assignment_testfiles_location_type,
-                assignment_testfiles_reference=assignment.assignment_testfiles_reference,
+                skeleton_f=assignment.skeleton_f,
+                testfiles_f=assignment.testfiles_f,
                 last_downloaded=assignment.last_downloaded,
                 deleted=assignment.deleted,
             )

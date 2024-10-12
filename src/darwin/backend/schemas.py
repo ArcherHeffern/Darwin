@@ -1,6 +1,7 @@
 # type: ignore
 from darwin.models.backend_models import (
     AccountId,
+    BlobId,
     AccountPermission,
     AccountStatus,
     AssignmentId,
@@ -21,6 +22,7 @@ from darwin.models.backend_models import (
 )
 from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
+from typing import Optional
 
 
 from .db_init import Base
@@ -36,6 +38,13 @@ class Account(Base):
     status: AccountStatus = Column(Enum(AccountStatus), nullable=False)
     permission: AccountPermission = Column(Enum(AccountPermission), nullable=False)
 
+class Blob(Base):
+    __tablename__ = "blob"
+
+    id: BlobId = Column(String, primary_key=True)
+    location_type: BlobLocationType = Column(Enum(BlobLocationType), nullable=False)
+    reference: str = Column(String, nullable=False)
+
 
 class Assignment(Base):
     __tablename__ = "assignment"
@@ -46,25 +55,22 @@ class Assignment(Base):
     due_date: str = Column(DateTime, nullable=False)
     project_type: ProjectType = Column(Enum(ProjectType), nullable=False)
     source_type: SourceType = Column(Enum(SourceType), nullable=False)
-    source_reference: str = Column(Text, nullable=False)
-    assignment_stub_location_type: BlobLocationType = Column(
-        Enum(BlobLocationType), nullable=False
-    )
-    assignment_stub_reference: str = Column(Text, nullable=False)
-    assignment_testfiles_location_type: BlobLocationType = Column(
-        Enum(BlobLocationType), nullable=True
-    )
-    assignment_testfiles_reference: str = Column(Text, nullable=False)
+    source_reference: str = Column(Text, nullable=True)
+    skeleton_f: Optional[BlobId] = Column(String, ForeignKey("blob.id"), nullable=True)
+    testfiles_f: BlobId = Column(String, ForeignKey("blob.id"), nullable=False)
     last_downloaded: str = Column(DateTime, nullable=True)
     deleted: bool = Column(Boolean, nullable=False, default=False)
 
     course = relationship("Course")
+    skeleton = relationship("Blob", primaryjoin="Assignment.skeleton_f == Blob.id")
+    testfiles = relationship("Blob", primaryjoin="Assignment.testfiles_f == Blob.id")
+
 
 
 class Course(Base):
     __tablename__ = "course"
 
-    id: int = Column(String, primary_key=True)
+    id: CourseId = Column(String, primary_key=True)
     name: str = Column(Text, nullable=False)
     deleted: bool = Column(Boolean, nullable=False)
 

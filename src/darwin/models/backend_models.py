@@ -21,6 +21,7 @@ GradingMetadataId = NewType("GradingMetadataId", str)
 NonPassingTestId = NewType("NonPassingTestId", str)
 TestCaseId = NewType("TestCaseId", str)
 SubmissionGroupId = NewType("SubmissionGroupId", str)
+BlobId = NewType("BlobId", str)
 
 
 """
@@ -56,17 +57,24 @@ class Assignment(BaseModel):
     due_date: datetime
     project_type: "ProjectType"
     source_type: "SourceType"
-    source_reference: str
-    assignment_stub_location_type: "BlobLocationType"
-    assignment_stub_reference: str
-    assignment_testfiles_location_type: "BlobLocationType"
-    assignment_testfiles_reference: str
+    source_reference: Optional[str]
+    skeleton_f: Optional[BlobId]
+    testfiles_f: BlobId
     last_downloaded: Optional[datetime]
     deleted: bool
 
     class Config:
         from_attributes = True
 
+"""
+============
+Blob
+============
+"""
+class Blob(BaseModel):
+    id: BlobId
+    location_type: 'BlobLocationType'
+    reference: str
 
 """
 ============

@@ -1,11 +1,19 @@
+from datetime import datetime
 from darwin.backend import Backend
 from darwin.models.backend_models import (
     Account,
     AccountId,
     AccountPermission,
     AccountStatus,
+    Assignment,
+    AssignmentId,
+    Blob,
+    BlobId,
+    BlobLocationType,
     Course,
     CourseId,
+    ProjectType,
+    SourceType,
     Student,
     StudentId,
     Ta,
@@ -100,6 +108,32 @@ class MockData:
         permission=AccountPermission.ADMIN,
     )
 
+    BLOB_PAXOS_SKELETON = Blob(
+        id=BlobId("8725101sha"),
+        location_type=BlobLocationType.DISK,
+        reference="./workspace/skeletons/pa4", # TODO: Create this!
+    )
+
+    BLOB_PAXOS_TESTS = Blob(
+        id=BlobId("06782345179"),
+        location_type=BlobLocationType.DISK,
+        reference="./workspace/tests/pa4" # TODO: Create this!
+    )
+
+    ASSIGNMENT_1 = Assignment(
+        id=AssignmentId("HAHAGOODLUCK"),
+        course_f=COURSE_1.id,
+        name="PA 4: Analysis of The Part Time Parliament",
+        due_date=datetime(1990, 1, 1),
+        project_type=ProjectType.MAVEN,
+        source_type=SourceType.DISK,
+        source_reference=None,
+        skeleton_f=BLOB_PAXOS_SKELETON.id,
+        testfiles_f=BLOB_PAXOS_TESTS.id,
+        last_downloaded=None,
+        deleted=False,
+    )
+
     @classmethod
     def create(cls):
         try:
@@ -119,5 +153,10 @@ class MockData:
             Backend.ta_dal.create(cls.TA_1)
 
             Backend.teacher_dal.create(cls.TEACHER_1)
+
+            Backend.blob_dal.create(cls.BLOB_PAXOS_SKELETON)
+            Backend.blob_dal.create(cls.BLOB_PAXOS_TESTS)
+
+            Backend.assignment_dal.create(cls.ASSIGNMENT_1)
         except:
             ...

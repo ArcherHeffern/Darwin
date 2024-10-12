@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, HTTPException
 from darwin.midtier.services.course import CourseService
 from darwin.models.midtier_models import (
@@ -20,7 +21,7 @@ router = APIRouter(
 
 
 @router.get("/")
-def get_all(account_id: AccountId) -> list[BasicCourse]:
+def get_all(account_id: Optional[AccountId] = None) -> list[BasicCourse]:
     return CourseService.get_all_basic(account_id)
 
 

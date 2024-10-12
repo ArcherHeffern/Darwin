@@ -3,6 +3,7 @@ import darwin.backend.schemas as schemas
 from darwin.backend.db_init import engine, SessionLocal
 from darwin.backend.dal.account import AccountDal
 from darwin.backend.dal.assignment import AssignmentDal
+from darwin.backend.dal.blob import BlobDal
 from darwin.backend.dal.course import CourseDal
 from darwin.backend.dal.grading_metadata import GradingMetadataDal
 from darwin.backend.dal.non_passing_test import NonPassingTestDal
@@ -28,6 +29,7 @@ class _Backend:
 
         self.account_dal = AccountDal(SessionLocal)
         self.assignment_dal = AssignmentDal(SessionLocal)
+        self.blob_dal = BlobDal(SessionLocal)
         self.course_dal = CourseDal(SessionLocal)
         self.grading_metadata_dal = GradingMetadataDal()
         self.non_passing_test_dal = NonPassingTestDal()
