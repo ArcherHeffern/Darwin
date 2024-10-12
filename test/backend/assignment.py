@@ -31,9 +31,11 @@ class AssignmentTests(TestCase):
         )
 
         Backend.assignment_dal.create(expected_assignment)
-        maybe_actual_assignment: Assignment|None = Backend.assignment_dal.get(expected_assignment.id)
+        maybe_actual_assignment: Assignment | None = Backend.assignment_dal.get(
+            expected_assignment.id
+        )
         self.assertIsNotNone(maybe_actual_assignment)
-        actual_assignment: Assignment = maybe_actual_assignment # type: ignore
+        actual_assignment: Assignment = maybe_actual_assignment  # type: ignore
         self.assertEqual(actual_assignment, expected_assignment)
         self.assertEqual(actual_assignment.id, expected_assignment.id)
         self.assertEqual(actual_assignment.due_date, expected_assignment.due_date)

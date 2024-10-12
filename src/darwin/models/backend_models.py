@@ -66,15 +66,19 @@ class Assignment(BaseModel):
     class Config:
         from_attributes = True
 
+
 """
 ============
 Blob
 ============
 """
+
+
 class Blob(BaseModel):
     id: BlobId
-    location_type: 'BlobLocationType'
+    location_type: "BlobLocationType"
     reference: str
+
 
 """
 ============

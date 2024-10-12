@@ -99,14 +99,14 @@ class Student(BaseStudent): ...
 # ================
 # Assignment
 # ================
-class BaseAssignment(BaseModel):
-    ...
+class BaseAssignment(BaseModel): ...
 
 
 class BasicAssignment(BaseAssignment):
     id: AssignmentId
     name: str
     due_date: datetime
+
 
 class Assignment(BaseAssignment):
     id: AssignmentId
@@ -119,6 +119,7 @@ class Assignment(BaseAssignment):
     skeleton_f: Optional[BlobId]
     testfiles_f: BlobId
     last_downloaded: Optional[datetime]
+
 
 class CreateAssignment(BaseAssignment):
     id: Optional[AssignmentId]

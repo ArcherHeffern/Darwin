@@ -1,6 +1,7 @@
 from darwin.models.backend_models import Assignment as BE_Assignment
 from darwin.models.midtier_models import Assignment as MT_Assignment
 
+
 def BE_assignment_to_MT_assignment(BE_assignment: BE_Assignment) -> MT_Assignment:
     return MT_Assignment(
         id=BE_assignment.id,

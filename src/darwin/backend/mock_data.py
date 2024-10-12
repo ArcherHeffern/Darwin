@@ -111,13 +111,13 @@ class MockData:
     BLOB_PAXOS_SKELETON = Blob(
         id=BlobId("8725101sha"),
         location_type=BlobLocationType.DISK,
-        reference="./workspace/skeletons/pa4", # TODO: Create this!
+        reference="./workspace/skeletons/pa4",  # TODO: Create this!
     )
 
     BLOB_PAXOS_TESTS = Blob(
         id=BlobId("06782345179"),
         location_type=BlobLocationType.DISK,
-        reference="./workspace/tests/pa4" # TODO: Create this!
+        reference="./workspace/tests/pa4",  # TODO: Create this!
     )
 
     ASSIGNMENT_1 = Assignment(

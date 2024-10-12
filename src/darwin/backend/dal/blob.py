@@ -13,11 +13,10 @@ class BlobDal(Dal_I):
                 reference=blob.reference,
             )
             db.add(db_blob)
-    
+
     def get(self, blob_id: BlobId) -> Optional[M_Blob]:
         with self.db_session() as db:
             maybe_blob = db.get(S_Blob, blob_id)
             if maybe_blob is None:
                 return None
             return M_Blob.model_validate(maybe_blob)
-    

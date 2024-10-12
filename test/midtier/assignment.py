@@ -1,4 +1,3 @@
-
 from datetime import datetime
 from darwin.models.backend_models import (
     AssignmentId,
@@ -52,7 +51,6 @@ class AssignmentTests(TestCase):
             testfiles_f=create_assignment.testfiles_f,
             last_downloaded=None,
         )
-
 
         AssignmentService.create(create_assignment)
         actual_basic_assignments = AssignmentService.get_all(course_id)

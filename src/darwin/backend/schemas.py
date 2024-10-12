@@ -20,7 +20,16 @@ from darwin.models.backend_models import (
     TestStatus,
     TestToRunId,
 )
-from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, Integer, String, Text
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
 from sqlalchemy.orm import relationship
 from typing import Optional
 
@@ -37,6 +46,7 @@ class Account(Base):
     hashed_password: str = Column(String, nullable=True)
     status: AccountStatus = Column(Enum(AccountStatus), nullable=False)
     permission: AccountPermission = Column(Enum(AccountPermission), nullable=False)
+
 
 class Blob(Base):
     __tablename__ = "blob"
@@ -64,7 +74,6 @@ class Assignment(Base):
     course = relationship("Course")
     skeleton = relationship("Blob", primaryjoin="Assignment.skeleton_f == Blob.id")
     testfiles = relationship("Blob", primaryjoin="Assignment.testfiles_f == Blob.id")
-
 
 
 class Course(Base):
