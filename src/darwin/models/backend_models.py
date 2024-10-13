@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import NewType
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Optional
+from typing import Optional, TypeAlias
 
 """
 ============
@@ -17,13 +17,19 @@ BlobId = NewType("BlobId", str)
 CourseId = NewType("CourseId", str)
 GradingMetadataId = NewType("GradingMetadataId", str)
 NonPassingTestId = NewType("NonPassingTestId", str)
+ResourcePermissionId = NewType("ResourcePermissionId", str)
 StudentId = NewType("StudentId", str)
 SubmissionGroupId = NewType("SubmissionGroupId", str)
 SubmissionId = NewType("SubmissionId", str)
 TaId = NewType("TaId", str)
 TeacherId = NewType("TeacherId", str)
-TestToRunId = NewType("TestToRunId", str)
 TestCaseId = NewType("TestCaseId", str)
+TestToRunId = NewType("TestToRunId", str)
+
+ResourceId: TypeAlias = (
+    AssignmentId | BlobId | CourseId | GradingMetadataId | NonPassingTestId | StudentId
+)
+
 
 """
 ============
@@ -46,7 +52,7 @@ class Account(BaseModel):
 
 """
 ============
-Assignment 
+AccountCreateToken 
 ============
 """
 
@@ -86,6 +92,23 @@ class Assignment(BaseModel):
 
 """
 ============
+AuthToken
+============
+"""
+
+
+class AuthToken(BaseModel):
+    token: AuthTokenId
+    account_f: AccountId
+    expiration: datetime
+    revoked: bool
+
+    def expired(self) -> bool:
+        return self.expiration < datetime.now()
+
+
+"""
+============
 Blob
 ============
 """
@@ -115,23 +138,6 @@ class Course(BaseModel):
 
 """
 ============
-Token
-============
-"""
-
-
-class AuthToken(BaseModel):
-    token: AuthTokenId
-    account_f: AccountId
-    expiration: datetime
-    revoked: bool
-
-    def expired(self) -> bool:
-        return self.expiration < datetime.now()
-
-
-"""
-============
 GradingMetadata
 ============
 """
@@ -152,6 +158,13 @@ class GradingMetadata(BaseModel):
         from_attributes = True
 
 
+"""
+============
+NonPassingTest
+============
+"""
+
+
 class NonPassingTest(BaseModel):
     id: NonPassingTestId
     submission_group_f: SubmissionGroupId
@@ -161,6 +174,27 @@ class NonPassingTest(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+"""
+============
+ResourcePermissions
+============
+"""
+
+
+class ResourcePermissions:
+    resource_permission_id: ResourcePermissionId
+    account_f: AccountId
+    resource_f: ResourceId
+    access_level: "AccessLevel"
+
+
+"""
+============
+Student
+============
+"""
 
 
 class Student(BaseModel):
@@ -173,6 +207,13 @@ class Student(BaseModel):
         from_attributes = True
 
 
+"""
+============
+SubmissionGroup
+============
+"""
+
+
 class SubmissionGroup(BaseModel):
     id: SubmissionGroupId
     student: StudentId
@@ -183,6 +224,13 @@ class SubmissionGroup(BaseModel):
         from_attributes = True
 
 
+"""
+============
+Submission
+============
+"""
+
+
 class Submission(BaseModel):
     id: SubmissionId
     submission_location_type_f: "BlobLocationType"
@@ -191,6 +239,13 @@ class Submission(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+"""
+============
+Ta
+============
+"""
 
 
 class Ta(BaseModel):
@@ -204,6 +259,13 @@ class Ta(BaseModel):
         from_attributes = True
 
 
+"""
+============
+Teacher
+============
+"""
+
+
 class Teacher(BaseModel):
     id: TeacherId
     account_f: AccountId
@@ -214,6 +276,13 @@ class Teacher(BaseModel):
         from_attributes = True
 
 
+"""
+============
+TestCase
+============
+"""
+
+
 class TestCase(BaseModel):
     id: TestCaseId
     assignment_f: AssignmentId
@@ -221,6 +290,13 @@ class TestCase(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+"""
+============
+TestToRun
+============
+"""
 
 
 class TestToRun(BaseModel):
@@ -237,6 +313,30 @@ class TestToRun(BaseModel):
 ###########################
 
 
+class AccessLevel(Enum):
+    NONE = 0
+    RD = 1
+    WR = 2
+    RD_WR = 3
+
+
+class AccountPermission(Enum):
+    MEMBER = 1
+    TEACHER = 2
+    ADMIN = 3
+
+
+class AccountStatus(Enum):
+    UNREGISTERED = 1
+    REGISTERED = 2
+    DELETED = 3
+
+
+class BlobLocationType(Enum):
+    DISK = 0
+    LOCAL_SQLITE = 1
+
+
 class ProjectType(Enum):
     MAVEN = 0
 
@@ -246,27 +346,10 @@ class SourceType(Enum):
     DISK = 1
 
 
-class BlobLocationType(Enum):
-    DISK = 0
-    LOCAL_SQLITE = 1
-
-
 class TestStatus(Enum):
     SKIPPED = 1
     FAILING = 2
     ERRORING = 3
-
-
-class AccountStatus(Enum):
-    UNREGISTERED = 1
-    REGISTERED = 2
-    DELETED = 3
-
-
-class AccountPermission(Enum):
-    MEMBER = 1
-    TEACHER = 2
-    ADMIN = 3
 
 
 # Exceptions
