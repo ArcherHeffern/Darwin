@@ -28,9 +28,7 @@ class AccountCreateTokenDal(Dal_I):
             if maybe_account_create_token is None:
                 return None
             return M_AccountCreateToken.model_validate(maybe_account_create_token)
-        
-    def delete_all(
-            self, email: str
-    ):
+
+    def delete_all(self, email: str):
         with self.db_session() as db:
             db.query(S_AccountCreateToken).filter_by(email=email).delete()

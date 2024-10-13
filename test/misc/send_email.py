@@ -8,7 +8,7 @@ https://support.google.com/accounts/answer/185833?visit_id=638643888300995887-15
 Must create app password to authenticate with GSMTP
 """
 g = Gmail
-RECIPIENT = 'xxx@gmail.com'
+RECIPIENT = "xxx@gmail.com"
 
 g.send(RECIPIENT, "TO THIS THING", "WOULD YOU LIKE LOTS OF MUNNY?????")
 

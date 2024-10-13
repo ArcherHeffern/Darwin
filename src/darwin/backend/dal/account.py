@@ -69,7 +69,7 @@ class AccountDal(Dal_I):
                 self.create(account)
             except:
                 ...
-    
+
     def update(self, account: M_Account) -> bool:
         """Updates account with same account_id"""
         with self.db_session() as db:

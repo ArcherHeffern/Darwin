@@ -62,30 +62,42 @@ class AccountService:
         account_create_token_dal.create(account_create_token)
 
         # Send email
-        Gmail.send(account_create.email, "Darwin Email Verification", f"Verify this is your email: {Config.WEB_HOST}/account/verify/{account_create_token.id}")
-
+        Gmail.send(
+            account_create.email,
+            "Darwin Email Verification",
+            f"Verify this is your email: {Config.WEB_HOST}/account/verify/{account_create_token.id}",
+        )
 
         return AccountCreateP1Response(ttl=Config.ACCOUNT_CREATE_TOKEN_EXPR_TIME)
 
-
     @staticmethod
-    def create_p2(token: AccountCreateTokenId, account_create: AccountCreateP2) -> MT_Account:
+    def create_p2(
+        token: AccountCreateTokenId, account_create: AccountCreateP2
+    ) -> MT_Account:
         maybe_account_create_token = account_create_token_dal.get(token)
 
         if maybe_account_create_token is None:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "Account Creation Token Not Found")
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND, "Account Creation Token Not Found"
+            )
         if maybe_account_create_token.expiration < datetime.now():
             raise HTTPException(status.HTTP_408_REQUEST_TIMEOUT, "Token is expired")
 
-        maybe_existing_account = account_dal.get_by_email(maybe_account_create_token.email)
+        maybe_existing_account = account_dal.get_by_email(
+            maybe_account_create_token.email
+        )
         if maybe_existing_account:
             maybe_existing_account.status = AccountStatus.REGISTERED
             maybe_existing_account.name = account_create.name
-            maybe_existing_account.hashed_password = hashpw(account_create.password.encode(), gensalt()).decode()
+            maybe_existing_account.hashed_password = hashpw(
+                account_create.password.encode(), gensalt()
+            ).decode()
             account_dal.update(maybe_existing_account)
             BE_account = maybe_existing_account
         else:
-            BE_account = account_formatter.AccountCreateP2_2_BE(maybe_account_create_token.email, account_create)
+            BE_account = account_formatter.AccountCreateP2_2_BE(
+                maybe_account_create_token.email, account_create
+            )
             account_dal.create(BE_account)
 
         account_create_token_dal.delete_all(email=maybe_account_create_token.email)

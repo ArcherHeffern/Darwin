@@ -46,7 +46,7 @@ class Account(Base):
     id: AccountId = Column(String, primary_key=True)
     email: str = Column(String, unique=True, index=True, nullable=False)
     name: str = Column(String, nullable=False)
-    hashed_password: str|None = Column(String, nullable=True)
+    hashed_password: str | None = Column(String, nullable=True)
     status: AccountStatus = Column(Enum(AccountStatus), nullable=False)
     permission: AccountPermission = Column(Enum(AccountPermission), nullable=False)
 

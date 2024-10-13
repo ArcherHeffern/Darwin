@@ -66,4 +66,10 @@ class MoodleClient:
 if __name__ == "__main__":
     from darwin.config import Config
 
-    print(len(MoodleClient(Config.MOODLE_SESSION).html_get_course(Config.COURSE_ID).participants))
+    print(
+        len(
+            MoodleClient(Config.MOODLE_SESSION)
+            .html_get_course(Config.COURSE_ID)
+            .participants
+        )
+    )

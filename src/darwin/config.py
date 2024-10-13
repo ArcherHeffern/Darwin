@@ -20,12 +20,12 @@ class Config:
     # ============
     # Gmail
     # ============
-    GMAIL_HOST: str = 'smtp.gmail.com'
+    GMAIL_HOST: str = "smtp.gmail.com"
     GMAIL_PORT: int = 587
-    GMAIL_ACCOUNT: str = env[em] # type: ignore
+    GMAIL_ACCOUNT: str = env[em]  # type: ignore
     # Create via https://support.google.com/accounts/answer/185833?visit_id=638643888300995887-1529178198&p=InvalidSecondFactor&rd=1
-    GOOGLE_APP_PASSWORD: str = env[gap] # type: ignore
+    GOOGLE_APP_PASSWORD: str = env[gap]  # type: ignore
 
     # Testing
     MOODLE_SESSION: str = env[ms]  # type: ignore
-    COURSE_ID: str = env[cid] # type: ignore
+    COURSE_ID: str = env[cid]  # type: ignore

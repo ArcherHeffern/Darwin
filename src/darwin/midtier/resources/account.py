@@ -7,7 +7,11 @@ from darwin.models.midtier_models import (
     AccountId,
     Account as MT_Account,
 )
-from darwin.models.backend_models import Account as BE_Account, AccountPermission, AccountCreateTokenId
+from darwin.models.backend_models import (
+    Account as BE_Account,
+    AccountPermission,
+    AccountCreateTokenId,
+)
 from darwin.midtier.services.account import AccountService
 from darwin.midtier.modules.authentication import ACCOUNT
 
@@ -46,7 +50,9 @@ def signup(account_create: AccountCreateP1) -> AccountCreateP1Response:
 
 
 @router.post("/verify_email/{token}")
-def verify_email(token: AccountCreateTokenId, account_create: AccountCreateP2) -> MT_Account:
+def verify_email(
+    token: AccountCreateTokenId, account_create: AccountCreateP2
+) -> MT_Account:
     return AccountService.create_p2(token, account_create)
 
 

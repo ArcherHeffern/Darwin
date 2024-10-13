@@ -32,8 +32,10 @@ class BaseAccount(BaseModel): ...
 class AccountCreateP1(BaseAccount):
     email: str
 
+
 class AccountCreateP1Response(BaseModel):
     ttl: timedelta
+
 
 class AccountCreateP2(BaseAccount):
     name: str
