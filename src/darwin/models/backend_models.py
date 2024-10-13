@@ -1,8 +1,8 @@
-from pydantic import BaseModel
-from typing import NewType
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Optional, TypeAlias
+from typing import NewType, Optional, TypeAlias
+
+from pydantic import BaseModel
 
 """
 ============

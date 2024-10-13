@@ -1,31 +1,44 @@
-from pydantic import BaseModel
 from datetime import datetime, timedelta
-from typing import NewType, Optional
+from itertools import chain
+from typing import Iterable, TypeAlias, Optional
+
+from pydantic import BaseModel
+
 from darwin.models.backend_models import (
     AccountId,
     AccountPermission,
     AccountStatus,
     AssignmentId,
-    TaId,
+    AuthTokenId,
     BlobId,
     CourseId,
+    GradingMetadataId,
+    NonPassingTestId,
+    ProjectType,
+    ResourceId,
+    ResourcePermissionId,
+    SourceType,
     StudentId,
+    SubmissionGroupId,
+    SubmissionId,
+    TaId,
     TeacherId,
     TestCaseId,
     TestToRunId,
-    AuthTokenId,
-    SubmissionId,
-    NonPassingTestId,
-    GradingMetadataId,
-    SubmissionGroupId,
-    ProjectType,
-    SourceType,
 )
 
 
-# ================
-# Course
-# ================
+AssignmentSkeletonId: TypeAlias = BlobId
+TestfilesId: TypeAlias = BlobId
+
+
+"""
+============
+Account 
+============
+"""
+
+
 class BaseAccount(BaseModel): ...
 
 
@@ -50,9 +63,68 @@ class Account(BaseAccount):
     permission: AccountPermission
 
 
-# ================
-# Course
-# ================
+"""
+================
+Assignment
+================
+"""
+
+
+class BaseAssignment(BaseModel): ...
+
+
+class BasicAssignment(BaseAssignment):
+    id: AssignmentId
+    name: str
+    due_date: datetime
+
+
+class CreateAssignment(BaseAssignment):
+    id: Optional[AssignmentId]
+    course_f: CourseId
+    name: str
+    due_date: datetime
+    project_type: "ProjectType"
+    source_type: "SourceType"
+    source_reference: Optional[str]
+    skeleton_f: Optional[BlobId]
+    testfiles_f: BlobId
+
+
+class Assignment(BaseAssignment):
+    id: AssignmentId
+    course_f: CourseId
+    name: str
+    due_date: datetime
+    project_type: "ProjectType"
+    source_type: "SourceType"
+    source_reference: Optional[str]
+    skeleton_f: Optional[BlobId]
+    testfiles_f: BlobId
+    last_downloaded: Optional[datetime]
+
+
+"""
+================
+AssignmentSkeleton
+================
+"""
+
+
+class BaseAssignmentSkeleton(BaseModel): ...
+
+
+class AssignmentSkeleton(BaseAssignmentSkeleton):
+    id: AssignmentSkeletonId
+
+
+"""
+================
+Course
+================
+"""
+
+
 class BaseCourse(BaseModel): ...
 
 
@@ -79,17 +151,73 @@ class Course(BaseCourse):
     students: list["Student"]
     assignments: list["BasicAssignment"]
 
+    def members(self) -> Iterable["Student|Ta|Teacher"]:
+        return chain(self.students, self.tas, self.teachers)
 
-# class CourseGetExtended(BaseCourse):
-#     teachers: list["TeacherGet"]
-#     students: list["StudentGet"]
-#     tas: list["TaGet"]
-#     assignments: list["AssignmentGet"]
+    def has_account(self, email: str) -> bool:
+        for member in self.members():
+            if member.email == email:
+                return True
+        return False
 
 
-# ================
-# Teacher
-# ================
+"""
+================
+GradingMetadata
+================
+"""
+
+
+class BaseGradingMetadata(BaseModel): ...
+
+
+class GradingMetadata(BaseGradingMetadata): ...
+"""
+================
+NonPassingTest
+================
+"""
+
+
+class BaseNonPassingTest(BaseModel): ...
+
+
+class NonPassingTest(BaseNonPassingTest): ...
+"""
+================
+Student
+================
+"""
+
+
+class BaseStudent(BaseModel):
+    id: StudentId
+    name: str
+    email: str
+
+
+class Student(BaseStudent): ...
+"""
+================
+Ta
+================
+"""
+
+
+class BaseTa(BaseModel):
+    id: TaId
+    name: str
+    email: str
+
+
+class Ta(BaseTa): ...
+"""
+================
+Teacher
+================
+"""
+
+
 class BaseTeacher(BaseModel):
     id: TeacherId
     name: str
@@ -100,82 +228,18 @@ class TeacherCreate(BaseTeacher): ...
 
 
 class Teacher(BaseTeacher): ...
+"""
+================
+TestFiles
+================
+"""
 
 
-# ================
-# TA
-# ================
-class BaseTa(BaseModel):
-    id: TaId
-    name: str
-    email: str
+class BaseTestfiles(BaseModel): ...
 
 
-class Ta(BaseTa): ...
-
-
-# ================
-# Student
-# ================
-class BaseStudent(BaseModel):
-    id: StudentId
-    name: str
-    email: str
-
-
-class Student(BaseStudent): ...
-
-
-# ================
-# Assignment
-# ================
-class BaseAssignment(BaseModel): ...
-
-
-class BasicAssignment(BaseAssignment):
-    id: AssignmentId
-    name: str
-    due_date: datetime
-
-
-class Assignment(BaseAssignment):
-    id: AssignmentId
-    course_f: CourseId
-    name: str
-    due_date: datetime
-    project_type: "ProjectType"
-    source_type: "SourceType"
-    source_reference: Optional[str]
-    skeleton_f: Optional[BlobId]
-    testfiles_f: BlobId
-    last_downloaded: Optional[datetime]
-
-
-class CreateAssignment(BaseAssignment):
-    id: Optional[AssignmentId]
-    course_f: CourseId
-    name: str
-    due_date: datetime
-    project_type: "ProjectType"
-    source_type: "SourceType"
-    source_reference: Optional[str]
-    skeleton_f: Optional[BlobId]
-    testfiles_f: BlobId
-
-
-# @dataclass
-# class Account:
-#     id: int  # Student id - Not nullable because this is known by moodle
-#     name: str  # Capitalized
-#     email: str
-#     password: Optional["str"]  # Null if account is inactive
-#     status: "AccountState"
-
-
-# class AccountState(Enum):
-#     inactive = 0
-#     active = 1
-#     deleted = 2
+class TestFiles(BaseTestfiles):
+    id: TestfilesId
 
 
 # @dataclass
@@ -200,18 +264,6 @@ class CreateAssignment(BaseAssignment):
 #     download_url: str
 #     date: datetime
 #     file: Optional[Path] = None
-
-
-# @dataclass
-# class GradingData:
-#     # Assume positive unless proven otherwise
-#     late: Optional[timedelta] = None
-#     proper_naming: bool = True
-#     grade: Optional[int] = None
-
-#     @property
-#     def graded(self):
-#         return self.grade is not None
 
 
 # class FileSubmissionGroup:
@@ -257,16 +309,3 @@ class CreateAssignment(BaseAssignment):
 #         )
 #         self.__filename = filename
 #         return filename
-
-
-# # Exceptions
-# class StorageException(RuntimeError): ...
-
-
-# class BadConfigException(RuntimeError): ...
-
-
-# class ProjectExecutionException(RuntimeError): ...
-
-
-# class ProjectValidationException(RuntimeError): ...
