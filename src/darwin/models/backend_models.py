@@ -178,12 +178,12 @@ class NonPassingTest(BaseModel):
 
 """
 ============
-ResourcePermissions
+ResourcePermission
 ============
 """
 
 
-class ResourcePermissions:
+class ResourcePermission:
     resource_permission_id: ResourcePermissionId
     account_f: AccountId
     resource_f: ResourceId

@@ -1,17 +1,19 @@
 # type: ignore
 from darwin.models.backend_models import (
+    AccessLevel,
     AccountId,
     AccountCreateTokenId,
-    AuthTokenId,
-    BlobId,
     AccountPermission,
     AccountStatus,
     AssignmentId,
+    AuthTokenId,
+    BlobId,
     BlobLocationType,
     CourseId,
     GradingMetadataId,
     NonPassingTestId,
     ProjectType,
+    ResourceId,
     SourceType,
     StudentId,
     SubmissionGroupId,
@@ -59,14 +61,6 @@ class AccountCreateToken(Base):
     expiration: datetime = Column(DateTime, nullable=False)
 
 
-class Blob(Base):
-    __tablename__ = "blob"
-
-    id: BlobId = Column(String, primary_key=True)
-    location_type: BlobLocationType = Column(Enum(BlobLocationType), nullable=False)
-    reference: str = Column(String, nullable=False)
-
-
 class Assignment(Base):
     __tablename__ = "assignment"
 
@@ -96,6 +90,14 @@ class AuthToken(Base):
     revoked: bool = Column(Boolean, nullable=False)
 
     account = relationship("Account")
+
+
+class Blob(Base):
+    __tablename__ = "blob"
+
+    id: BlobId = Column(String, primary_key=True)
+    location_type: BlobLocationType = Column(Enum(BlobLocationType), nullable=False)
+    reference: str = Column(String, nullable=False)
 
 
 class Course(Base):
@@ -137,6 +139,15 @@ class NonPassingTest(Base):
 
     submission_group = relationship("SubmissionGroup")
     test_case = relationship("TestCase")
+
+
+class ResourcePermission(Base):
+    __tablename__ = "resource_permission"
+
+    id: ResourcePermissionId
+    account_f: AccountId = Column(String, ForeignKey("account.id"), nullable=False)
+    resource_f: ResourceId = Column(String, nullable=False)
+    access_level: AccessLevel = Column(Enum(AccessLevel), nullable=False)
 
 
 class Student(Base):
