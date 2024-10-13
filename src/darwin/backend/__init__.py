@@ -1,3 +1,5 @@
+from darwin.backend.dal.auth_token import AuthTokenDal
+from darwin.backend.dal.account_create_token import AccountCreateTokenDal
 from darwin.models.backend_models import Course, CourseId
 import darwin.backend.schemas as schemas
 from darwin.backend.db_init import engine, SessionLocal
@@ -14,7 +16,7 @@ from darwin.backend.dal.teacher_course import TeacherCourseDal
 from darwin.backend.dal.teacher import TeacherDal
 from darwin.backend.dal.test_case import TestCaseDal
 from darwin.backend.dal.test_to_run import TestToRunDal
-from config import Config
+from darwin.config import Config
 
 # TODO: Grading config used by assignment for grading
 # TODO: Notification system
@@ -28,6 +30,7 @@ class _Backend:
         schemas.Base.metadata.create_all(bind=engine)
 
         self.account_dal = AccountDal(SessionLocal)
+        self.account_create_token_dal = AccountCreateTokenDal(SessionLocal)
         self.assignment_dal = AssignmentDal(SessionLocal)
         self.blob_dal = BlobDal(SessionLocal)
         self.course_dal = CourseDal(SessionLocal)
@@ -36,6 +39,7 @@ class _Backend:
         self.student_dal = StudentDal(SessionLocal)
         self.submission_dal = SubmissionDal()
         self.ta_dal = TaDal(SessionLocal)
+        self.auth_token_dal = AuthTokenDal(SessionLocal)
         self.teacher_course_dal = TeacherCourseDal()
         self.teacher_dal = TeacherDal(SessionLocal)
         self.test_case_dal = TestCaseDal()

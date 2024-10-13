@@ -21,7 +21,6 @@ class StudentDal(Dal_I):
 
         with self.db_session() as db:
             db.add_all(db_students)
-            db.commit()
 
     def maybe_get(self, student_id: StudentId) -> Optional[M_Student]:
         with self.db_session() as db:

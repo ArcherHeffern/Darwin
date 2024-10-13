@@ -64,12 +64,6 @@ class MoodleClient:
 
 
 if __name__ == "__main__":
-    import dotenv
+    from darwin.config import Config
 
-    d = dotenv.dotenv_values()
-    MOODLE_SESSION = d["MOODLE_SESSION"]
-    COURSE_ID = d["COURSE_ID"]
-    if not MOODLE_SESSION or not COURSE_ID:
-        raise Exception("Expected MOODLE_SESSION in .env")
-
-    print(len(MoodleClient(MOODLE_SESSION).html_get_course(COURSE_ID).participants))
+    print(len(MoodleClient(Config.MOODLE_SESSION).html_get_course(Config.COURSE_ID).participants))

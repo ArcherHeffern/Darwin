@@ -1,6 +1,8 @@
 # type: ignore
 from darwin.models.backend_models import (
     AccountId,
+    AccountCreateTokenId,
+    AuthTokenId,
     BlobId,
     AccountPermission,
     AccountStatus,
@@ -30,6 +32,7 @@ from sqlalchemy import (
     String,
     Text,
 )
+from datetime import datetime
 from sqlalchemy.orm import relationship
 from typing import Optional
 
@@ -43,9 +46,17 @@ class Account(Base):
     id: AccountId = Column(String, primary_key=True)
     email: str = Column(String, unique=True, index=True, nullable=False)
     name: str = Column(String, nullable=False)
-    hashed_password: str = Column(String, nullable=True)
+    hashed_password: str|None = Column(String, nullable=True)
     status: AccountStatus = Column(Enum(AccountStatus), nullable=False)
     permission: AccountPermission = Column(Enum(AccountPermission), nullable=False)
+
+
+class AccountCreateToken(Base):
+    __tablename__ = "account_create_token"
+
+    id: AccountCreateTokenId = Column(String, primary_key=True)
+    email: str = Column(String, nullable=False)
+    expiration: datetime = Column(DateTime, nullable=False)
 
 
 class Blob(Base):
@@ -62,18 +73,29 @@ class Assignment(Base):
     id: AssignmentId = Column(String, primary_key=True)
     course_f: CourseId = Column(String, ForeignKey("course.id"), nullable=False)
     name: str = Column(Text, nullable=False)
-    due_date: str = Column(DateTime, nullable=False)
+    due_date: datetime = Column(DateTime, nullable=False)
     project_type: ProjectType = Column(Enum(ProjectType), nullable=False)
     source_type: SourceType = Column(Enum(SourceType), nullable=False)
     source_reference: str = Column(Text, nullable=True)
     skeleton_f: Optional[BlobId] = Column(String, ForeignKey("blob.id"), nullable=True)
     testfiles_f: BlobId = Column(String, ForeignKey("blob.id"), nullable=False)
-    last_downloaded: str = Column(DateTime, nullable=True)
+    last_downloaded: datetime = Column(DateTime, nullable=True)
     deleted: bool = Column(Boolean, nullable=False, default=False)
 
     course = relationship("Course")
     skeleton = relationship("Blob", primaryjoin="Assignment.skeleton_f == Blob.id")
     testfiles = relationship("Blob", primaryjoin="Assignment.testfiles_f == Blob.id")
+
+
+class AuthToken(Base):
+    __tablename__ = "auth_token"
+
+    token: AuthTokenId = Column(String, primary_key=True)
+    account_f: AccountId = Column(String, ForeignKey("account.id"), nullable=False)
+    expiration: datetime = Column(DateTime, nullable=False)
+    revoked: bool = Column(Boolean, nullable=False)
+
+    account = relationship("Account")
 
 
 class Course(Base):

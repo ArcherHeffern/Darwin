@@ -34,7 +34,7 @@ class MockData:
         name="Timmy",
         hashed_password=None,
         status=AccountStatus.UNREGISTERED,
-        permission=AccountPermission.NONE,
+        permission=AccountPermission.MEMBER,
     )
     STUDENT_1 = Student(
         id=StudentId("helloworld"),
@@ -50,7 +50,7 @@ class MockData:
         name="Jimmy",
         hashed_password="fishboy",
         status=AccountStatus.REGISTERED,
-        permission=AccountPermission.NONE,
+        permission=AccountPermission.MEMBER,
     )
     STUDENT_2 = Student(
         id=StudentId("nurplehdfkjfkl"),
@@ -66,7 +66,7 @@ class MockData:
         name="Efren",
         hashed_password=None,
         status=AccountStatus.UNREGISTERED,
-        permission=AccountPermission.NONE,
+        permission=AccountPermission.MEMBER,
     )
     STUDENT_3 = Student(
         id=StudentId("goodbyeworld"),

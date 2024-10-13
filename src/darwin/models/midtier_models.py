@@ -1,8 +1,11 @@
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import NewType, Optional
 from darwin.models.backend_models import (
     AccountId,
+    AccountPermission,
+    AccountStatus,
+    AssignmentId,
     TaId,
     BlobId,
     CourseId,
@@ -10,7 +13,7 @@ from darwin.models.backend_models import (
     TeacherId,
     TestCaseId,
     TestToRunId,
-    AssignmentId,
+    AuthTokenId,
     SubmissionId,
     NonPassingTestId,
     GradingMetadataId,
@@ -18,6 +21,31 @@ from darwin.models.backend_models import (
     ProjectType,
     SourceType,
 )
+
+
+# ================
+# Course
+# ================
+class BaseAccount(BaseModel): ...
+
+
+class AccountCreateP1(BaseAccount):
+    email: str
+
+class AccountCreateP1Response(BaseModel):
+    ttl: timedelta
+
+class AccountCreateP2(BaseAccount):
+    name: str
+    password: str
+
+
+class Account(BaseAccount):
+    id: AccountId
+    email: str
+    name: str  # Capitalized
+    status: AccountStatus
+    permission: AccountPermission
 
 
 # ================

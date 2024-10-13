@@ -9,20 +9,21 @@ from typing import Optional
 IDs
 ============
 """
-CourseId = NewType("CourseId", str)
-AssignmentId = NewType("AssignmentId", str)
-TestToRunId = NewType("TestToRunId", str)
 AccountId = NewType("AccountId", str)
-TeacherId = NewType("TeacherId", str)
-TaId = NewType("TaId", str)
-StudentId = NewType("StudentId", str)
-SubmissionId = NewType("SubmissionId", str)
+AccountCreateTokenId = NewType("AccountCreateTokenId", str)
+AssignmentId = NewType("AssignmentId", str)
+AuthTokenId = NewType("AuthTokenId", str)
+BlobId = NewType("BlobId", str)
+CourseId = NewType("CourseId", str)
 GradingMetadataId = NewType("GradingMetadataId", str)
 NonPassingTestId = NewType("NonPassingTestId", str)
-TestCaseId = NewType("TestCaseId", str)
+StudentId = NewType("StudentId", str)
 SubmissionGroupId = NewType("SubmissionGroupId", str)
-BlobId = NewType("BlobId", str)
-
+SubmissionId = NewType("SubmissionId", str)
+TaId = NewType("TaId", str)
+TeacherId = NewType("TeacherId", str)
+TestToRunId = NewType("TestToRunId", str)
+TestCaseId = NewType("TestCaseId", str)
 
 """
 ============
@@ -38,6 +39,22 @@ class Account(BaseModel):
     hashed_password: Optional["str"]  # Null if account is inactive
     status: "AccountStatus"
     permission: "AccountPermission"
+
+    class Config:
+        from_attributes = True
+
+
+"""
+============
+Assignment 
+============
+"""
+
+
+class AccountCreateToken(BaseModel):
+    id: AccountCreateTokenId
+    email: str
+    expiration: datetime
 
     class Config:
         from_attributes = True
@@ -94,6 +111,23 @@ class Course(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+"""
+============
+Token
+============
+"""
+
+
+class AuthToken(BaseModel):
+    token: AuthTokenId
+    account_f: AccountId
+    expiration: datetime
+    revoked: bool
+
+    def expired(self) -> bool:
+        return self.expiration < datetime.now()
 
 
 """
@@ -227,12 +261,10 @@ class AccountStatus(Enum):
     UNREGISTERED = 1
     REGISTERED = 2
     DELETED = 3
-    REQUESTED = 4
-    DENIED = 5
 
 
 class AccountPermission(Enum):
-    NONE = 1
+    MEMBER = 1
     TEACHER = 2
     ADMIN = 3
 

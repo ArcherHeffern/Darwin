@@ -6,10 +6,19 @@ from sqlalchemy.orm.session import Session
 
 
 class AccountDal(Dal_I):
-    def get(self, account_id: AccountId) -> M_Account:
+    def get(self, account_id: AccountId) -> Optional[M_Account]:
         with self.db_session() as db:
-            db_account = db.query(S_Account).filter_by(id=account_id).one()
-            return M_Account.model_validate(db_account)
+            maybe_account = db.get(S_Account, account_id)
+            if maybe_account is None:
+                return None
+            return M_Account.model_validate(maybe_account)
+
+    def get_by_email(self, email: str) -> Optional[M_Account]:
+        with self.db_session() as db:
+            maybe_account = db.query(S_Account).filter_by(email=email).one_or_none()
+            if maybe_account is None:
+                return None
+            return M_Account.model_validate(maybe_account)
 
     def get_all(
         self, account_ids: Optional[Iterable[AccountId]] = None
@@ -17,7 +26,7 @@ class AccountDal(Dal_I):
         with self.db_session() as db:
             query = db.query(S_Account)
             if account_ids:
-                query = query.filter(S_Account.id.in_(account_ids))
+                query = query.filter(S_Account.id.in_(account_ids))  # type: ignore
 
             db_accounts = query.all()
             return [M_Account.model_validate(db_account) for db_account in db_accounts]
@@ -60,3 +69,15 @@ class AccountDal(Dal_I):
                 self.create(account)
             except:
                 ...
+    
+    def update(self, account: M_Account) -> bool:
+        """Updates account with same account_id"""
+        with self.db_session() as db:
+            maybe_account = db.get(S_Account, account.id)
+            if maybe_account is None:
+                return False
+            maybe_account.name = account.name
+            maybe_account.hashed_password = account.hashed_password
+            maybe_account.status = account.status
+            maybe_account.permission = account.permission
+        return True
