@@ -1,4 +1,5 @@
 from datetime import datetime
+from bcrypt import hashpw, gensalt
 from darwin.backend import Backend
 from darwin.models.backend_models import (
     Account,
@@ -22,10 +23,12 @@ from darwin.models.backend_models import (
     TeacherId,
 )
 
+def to_pw(password: str) -> str:
+    return hashpw(password.encode(), gensalt()).decode()
 
 class MockData:
-    COURSE_1 = Course(id=CourseId("8974845845"), name="COSI 89B", deleted=False)
-    COURSE_2 = Course(id=CourseId("asdfjgk"), name="COSI 400", deleted=False)
+    COURSE_1 = Course(id=CourseId("8974845845"), name="COSI 89B", source_type=SourceType.DISK, deleted=False)
+    COURSE_2 = Course(id=CourseId("asdfjgk"), name="COSI 400", source_type=SourceType.DISK, deleted=False)
 
     # Account 1
     STUDENT_ACCOUNT_1 = Account(
@@ -48,7 +51,7 @@ class MockData:
         id=AccountId("09824jvsjfw82r"),
         email="j@j",
         name="Jimmy",
-        hashed_password="fishboy",
+        hashed_password=to_pw("fishboy"),
         status=AccountStatus.REGISTERED,
         permission=AccountPermission.MEMBER,
     )
@@ -101,9 +104,9 @@ class MockData:
     # Account 5
     ADMIN_ACCOUNT_1 = Account(
         id=AccountId("SUPERGODGOATED"),
-        email="god@god",
+        email="god",
         name="Adam",
-        hashed_password="MassiveUziVert",
+        hashed_password=to_pw("steve"),
         status=AccountStatus.REGISTERED,
         permission=AccountPermission.ADMIN,
     )

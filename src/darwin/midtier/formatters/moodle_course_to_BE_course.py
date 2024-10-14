@@ -2,6 +2,7 @@ from darwin.models.backend_models import (
     AccountPermission,
     AccountStatus,
     Course as BE_Course,
+    SourceType,
     Student as BE_Student,
     StudentId as BE_StudentId,
     Account as BE_Account,
@@ -21,8 +22,8 @@ def moodle_course_to_BE_course(
 ) -> tuple[
     BE_Course, list[BE_Account], list[BE_Student], list[BE_Ta], list[BE_Teacher]
 ]:
-    course_id = BE_CourseId(moodle_course.id)
-    course = BE_Course(id=course_id, name=moodle_course.name, deleted=False)
+    course_id = BE_CourseId(str(uuid4()))
+    course = BE_Course(id=course_id, name=moodle_course.name, deleted=False, source_type=SourceType.MOODLE, source=moodle_course.id)
     accounts: list[BE_Account] = []
     students: list[BE_Student] = []
     tas: list[BE_Ta] = []
@@ -36,11 +37,11 @@ def moodle_course_to_BE_course(
             name=participant.name,
             hashed_password=None,
             status=AccountStatus.UNREGISTERED,
-            permission=AccountPermission.NONE,
+            permission=AccountPermission.MEMBER,
         )
         match participant.role:
             case MoodleCourseParticipantRole.STUDENT:
-                student_id = BE_StudentId(participant.id)
+                student_id = BE_StudentId(str(uuid4()))
                 students.append(
                     BE_Student(
                         id=student_id,
@@ -51,7 +52,7 @@ def moodle_course_to_BE_course(
                 )
             case MoodleCourseParticipantRole.INSTRUCTOR:
                 account.permission = AccountPermission.TEACHER
-                teacher_id = BE_TeacherId(participant.id)
+                teacher_id = BE_TeacherId(str(uuid4()))
                 teachers.append(
                     BE_Teacher(
                         id=teacher_id,
@@ -61,7 +62,7 @@ def moodle_course_to_BE_course(
                     )
                 )
             case MoodleCourseParticipantRole.NONE:
-                student_id = BE_TaId(participant.id)
+                student_id = BE_TaId(str(uuid4()))
                 tas.append(
                     BE_Ta(
                         id=student_id,

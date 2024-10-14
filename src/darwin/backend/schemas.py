@@ -106,6 +106,8 @@ class Course(Base):
     id: CourseId = Column(String, primary_key=True)
     name: str = Column(Text, nullable=False)
     deleted: bool = Column(Boolean, nullable=False)
+    source_type: SourceType = Column(Enum(SourceType), nullable=False)
+    source: Optional[str] = Column(String, nullable=True)
 
 
 class GradingMetadata(Base):
@@ -144,9 +146,8 @@ class NonPassingTest(Base):
 class ResourcePermission(Base):
     __tablename__ = "resource_permission"
 
-    id: ResourcePermissionId
-    account_f: AccountId = Column(String, ForeignKey("account.id"), nullable=False)
-    resource_f: ResourceId = Column(String, nullable=False)
+    account_id: AccountId = Column(String, ForeignKey("account.id"), primary_key=True, nullable=False)
+    resource_id: ResourceId = Column(String, primary_key=True)
     access_level: AccessLevel = Column(Enum(AccessLevel), nullable=False)
 
 

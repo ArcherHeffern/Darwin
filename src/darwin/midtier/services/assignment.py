@@ -1,16 +1,20 @@
 from typing import Optional
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from darwin.backend import Backend
 from darwin.midtier.formatters.CreateAssignment_to_BE_Assignment import (
     createAssignment_to_BE_assignment,
 )
+from darwin.midtier.services.course import CourseService
 from darwin.models.midtier_models import (
+    Account,
     BasicAssignment,
     Assignment as MT_Assignment,
     AssignmentId,
+    AccountId, 
     CreateAssignment,
 )
 from darwin.models.backend_models import (
+    AccountPermission,
     Assignment as BE_Assignment,
     SourceType,
     CourseId,
@@ -37,7 +41,7 @@ class AssignmentService:
 
     @staticmethod
     def get_all(
-        course_id: Optional[CourseId], hide_deleted: bool = True
+        course_id: Optional[CourseId] = None, hide_deleted: bool = True
     ) -> list[BasicAssignment]:
         BE_assignments = Backend.assignment_dal.get_all(course_id, hide_deleted)
         return [

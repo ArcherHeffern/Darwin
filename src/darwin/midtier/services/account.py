@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
+from darwin.config import Config
 
-from bcrypt import gensalt, hashpw
+from darwin.midtier.formatters import auth_token_formatter
+from bcrypt import gensalt, hashpw, checkpw
 from darwin.config import Config
 from uuid import uuid4
 from fastapi import HTTPException, status
@@ -9,12 +11,15 @@ from darwin.models.backend_models import (
     AccountCreateToken,
     AccountCreateTokenId,
     AccountStatus,
+    AuthToken as BE_AuthToken,
+    AuthTokenId,
 )
 from darwin.models.midtier_models import (
     Account as MT_Account,
     AccountCreateP1,
     AccountCreateP1Response,
     AccountCreateP2,
+    AuthToken as MT_AuthToken,
 )
 from darwin.midtier.formatters import account_formatter
 from darwin.backend import Backend
@@ -22,6 +27,7 @@ from darwin.midtier.clients.gmail import Gmail
 
 account_dal = Backend.account_dal
 account_create_token_dal = Backend.account_create_token_dal
+auth_token_dal = Backend.auth_token_dal
 
 
 class AccountService:
@@ -103,3 +109,23 @@ class AccountService:
         account_create_token_dal.delete_all(email=maybe_account_create_token.email)
 
         return account_formatter.BE_2_MT(BE_account)
+    
+    @staticmethod
+    def login(username: str, password: str) -> MT_AuthToken:
+        db_account = account_dal.get_by_email(username)
+        if db_account is None or db_account.status != AccountStatus.REGISTERED:
+            raise HTTPException(status.HTTP_404_NOT_FOUND)
+        if db_account.hashed_password is None:
+            raise Exception(f"Expected active account (id={db_account.id}) to contain hashed_password attribute but found None")
+        if not checkpw(password.encode(), db_account.hashed_password.encode()):
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+        auth_token_id = AuthTokenId(str(uuid4()))
+        BE_auth_token = BE_AuthToken(
+            token=auth_token_id,
+            account_f=db_account.id,
+            expiration=datetime.now() + Config.AUTH_TOKEN_EXPIRATION,
+            revoked=False
+        )
+        auth_token_dal.delete_by_account(db_account.id)
+        auth_token_dal.create(BE_auth_token)
+        return auth_token_formatter.BE_2_MT(BE_auth_token)

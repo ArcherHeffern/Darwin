@@ -106,6 +106,9 @@ class AuthToken(BaseModel):
     def expired(self) -> bool:
         return self.expiration < datetime.now()
 
+    class Config:
+        from_attributes = True
+
 
 """
 ============
@@ -119,6 +122,9 @@ class Blob(BaseModel):
     location_type: "BlobLocationType"
     reference: str
 
+    class Config:
+        from_attributes = True
+
 
 """
 ============
@@ -131,6 +137,8 @@ class Course(BaseModel):
     id: CourseId
     name: str
     deleted: bool
+    source_type: 'SourceType'
+    source: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -183,11 +191,13 @@ ResourcePermission
 """
 
 
-class ResourcePermission:
-    resource_permission_id: ResourcePermissionId
-    account_f: AccountId
-    resource_f: ResourceId
+class ResourcePermission(BaseModel):
+    account_id: AccountId
+    resource_id: ResourceId
     access_level: "AccessLevel"
+
+    class Config:
+        from_attributes = True
 
 
 """
@@ -316,14 +326,15 @@ class TestToRun(BaseModel):
 class AccessLevel(Enum):
     NONE = 0
     RD = 1
-    WR = 2
     RD_WR = 3
+    RD_WR_DEL = 4
 
 
 class AccountPermission(Enum):
     MEMBER = 1
-    TEACHER = 2
-    ADMIN = 3
+    TA = 2
+    TEACHER = 3
+    ADMIN = 4
 
 
 class AccountStatus(Enum):

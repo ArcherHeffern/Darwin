@@ -6,7 +6,7 @@ from darwin.models.backend_models import AccountStatus, AuthTokenId
 from darwin.models.midtier_models import Account, AccountStatus, AuthTokenId
 from darwin.midtier.services.account import AccountService
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="account/login")
 token_dal = Backend.auth_token_dal
 account_dal = Backend.account_dal
 

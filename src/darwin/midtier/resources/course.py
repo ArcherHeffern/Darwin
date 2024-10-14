@@ -1,4 +1,6 @@
+from typing import cast
 from fastapi import APIRouter, HTTPException, status
+from regex import W
 from darwin.midtier.services.course import CourseService
 from darwin.models.backend_models import AccountPermission
 from darwin.models.midtier_models import (
@@ -8,10 +10,7 @@ from darwin.models.midtier_models import (
     AccountId,
     CourseId,
 )
-from darwin.midtier.clients.moodle.moodle_client import MoodleClient
-from darwin.models.client_models import MoodleCourse
-import darwin.midtier.services.moodle_course_service as MoodleCourseService
-from darwin.midtier.modules.authentication import ACCOUNT
+from darwin.midtier.modules.authentication import ACCOUNT, raise_if_not_admin, raise_if_unauthorized_create, raise_if_unauthorized_get
 
 router = APIRouter(
     prefix="/course",
@@ -19,30 +18,29 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+@router.get("/user/")
+def get_all_courses_for_self(account: ACCOUNT):
+    return CourseService.get_all_basic(account.id)
+
+
+@router.get("/user/{account_id}")
+def get_all_for_account(account: ACCOUNT, account_id: AccountId) -> list[BasicCourse]:
+    raise_if_not_admin(account)
+    return CourseService.get_all_basic(account_id)
+
 
 @router.get("/")
-def get_all(account: ACCOUNT, all: bool = False) -> list[BasicCourse]:
-    if not all:
-        return CourseService.get_all_basic(account.id)
-    if account.permission != AccountPermission.ADMIN:
-        raise HTTPException(
-            status.HTTP_401_UNAUTHORIZED,
-            "Must have admin permission to get all courses",
-        )
+def get_all() -> list[BasicCourse]:
     return CourseService.get_all_basic()
 
 
 @router.get("/{course_id}")
-def get(course_id: CourseId) -> Course:
+def get(account: ACCOUNT, course_id: CourseId) -> Course:
+    raise_if_unauthorized_get(account, course_id)
     return CourseService.get(course_id)
 
 
 @router.post("/moodle", status_code=201)
-def createMoodle(moodle_course_create: MoodleCourseCreate) -> Course:
-    moodle_course: MoodleCourse = MoodleClient(
-        moodle_course_create.moodle_session,
-    ).html_get_course(moodle_course_create.id)
-    try:
-        return MoodleCourseService.create(moodle_course)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+def createMoodle(account: ACCOUNT, moodle_course_create: MoodleCourseCreate) -> Course:
+    raise_if_unauthorized_create(account, AccountPermission.TA)
+    return CourseService.create_moodle_course(account, moodle_course_create)

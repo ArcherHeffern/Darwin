@@ -3,6 +3,7 @@ from darwin.backend.dal.dal_I import Dal_I
 from itertools import chain
 from darwin.models.backend_models import (
     Account as M_Account,
+    SourceType,
     Student as M_Student,
     Teacher as M_Teacher,
     Course as M_Course,
@@ -23,7 +24,7 @@ class CourseDal(Dal_I):
     def create(self, course: M_Course):
         with self.db_session() as db:
             db_course: S_Course = S_Course(
-                id=course.id, name=course.name, deleted=course.deleted
+                id=course.id, name=course.name, deleted=course.deleted, source_type=course.source_type, source=course.source
             )
             db.add(db_course)
             db.commit()
@@ -37,9 +38,16 @@ class CourseDal(Dal_I):
                 M_Course.model_validate(db_course) for db_course in db_courses.all()
             ]
 
-    def get(self, id: CourseId) -> Optional[M_Course]:
+    def get_by_id(self, id: CourseId) -> Optional[M_Course]:
         with self.db_session() as db:
             maybe_course = db.get(S_Course, id)
+            if maybe_course is None:
+                return None
+            return M_Course.model_validate(maybe_course)
+        
+    def get_by_source(self, source_type: SourceType, source: str):
+        with self.db_session() as db:
+            maybe_course = db.query(S_Course).filter_by(source_type=source_type, source=source).one_or_none()
             if maybe_course is None:
                 return None
             return M_Course.model_validate(maybe_course)

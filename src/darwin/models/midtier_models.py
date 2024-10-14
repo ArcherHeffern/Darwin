@@ -120,6 +120,21 @@ class AssignmentSkeleton(BaseAssignmentSkeleton):
 
 """
 ================
+AuthToken
+================
+"""
+
+
+class BaseAuthToken(BaseModel): ...
+
+
+class AuthToken(BaseModel):
+    auth_token: AuthTokenId
+    expiration: datetime
+
+
+"""
+================
 Course
 ================
 """

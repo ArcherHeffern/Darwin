@@ -2,7 +2,6 @@ from typing import Iterable, Optional
 from darwin.backend.dal.dal_I import Dal_I
 from darwin.models.backend_models import AccountId, Account as M_Account
 from darwin.backend.schemas import Account as S_Account
-from sqlalchemy.orm.session import Session
 
 
 class AccountDal(Dal_I):
@@ -58,17 +57,20 @@ class AccountDal(Dal_I):
             db.add_all(db_accounts)
             db.commit()
 
-    def try_create_all(self, accounts: list[M_Account]):
+    def try_create_all(self, accounts: list[M_Account]) -> list[AccountId]:
         """
         Creates as many accounts as possible
 
         Does NOT raise errors on insertion error
         """
+        created_account_ids: list[AccountId] = []
         for account in accounts:
             try:
                 self.create(account)
             except:
                 ...
+            created_account_ids.append(account.id)
+        return created_account_ids
 
     def update(self, account: M_Account) -> bool:
         """Updates account with same account_id"""
