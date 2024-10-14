@@ -10,7 +10,7 @@ from darwin.models.midtier_models import (
     BasicAssignment,
     Assignment as MT_Assignment,
     AssignmentId,
-    AccountId, 
+    AccountId,
     CreateAssignment,
 )
 from darwin.models.backend_models import (

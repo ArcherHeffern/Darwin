@@ -1,5 +1,10 @@
 from fastapi import APIRouter
-from darwin.midtier.modules.authentication import ACCOUNT, raise_if_not_admin, raise_if_unauthorized_get, raise_if_unauthorized_modify
+from darwin.midtier.modules.authentication import (
+    ACCOUNT,
+    raise_if_not_admin,
+    raise_if_unauthorized_get,
+    raise_if_unauthorized_modify,
+)
 from darwin.midtier.services.assignment import AssignmentService
 from darwin.models.backend_models import AccountPermission
 from darwin.models.midtier_models import (
@@ -33,10 +38,11 @@ def get_assignments_by_course(
 
 
 @router.get("/")
-def get_assignments(account: ACCOUNT, hide_deleted: bool = True) -> list[BasicAssignment]:
+def get_assignments(
+    account: ACCOUNT, hide_deleted: bool = True
+) -> list[BasicAssignment]:
     raise_if_not_admin(account)
     return AssignmentService.get_all(hide_deleted=hide_deleted)
-
 
 
 @router.post("/", status_code=201)

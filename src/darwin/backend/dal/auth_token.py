@@ -1,6 +1,10 @@
 from typing import Optional
 from darwin.backend.dal.dal_I import Dal_I
-from darwin.models.backend_models import AuthToken as M_AuthToken, AuthTokenId, AccountId
+from darwin.models.backend_models import (
+    AuthToken as M_AuthToken,
+    AuthTokenId,
+    AccountId,
+)
 from darwin.backend.schemas import AuthToken as S_AuthToken
 
 

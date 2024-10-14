@@ -146,7 +146,9 @@ class NonPassingTest(Base):
 class ResourcePermission(Base):
     __tablename__ = "resource_permission"
 
-    account_id: AccountId = Column(String, ForeignKey("account.id"), primary_key=True, nullable=False)
+    account_id: AccountId = Column(
+        String, ForeignKey("account.id"), primary_key=True, nullable=False
+    )
     resource_id: ResourceId = Column(String, primary_key=True)
     access_level: AccessLevel = Column(Enum(AccessLevel), nullable=False)
 

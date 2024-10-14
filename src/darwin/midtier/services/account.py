@@ -109,14 +109,16 @@ class AccountService:
         account_create_token_dal.delete_all(email=maybe_account_create_token.email)
 
         return account_formatter.BE_2_MT(BE_account)
-    
+
     @staticmethod
     def login(username: str, password: str) -> MT_AuthToken:
         db_account = account_dal.get_by_email(username)
         if db_account is None or db_account.status != AccountStatus.REGISTERED:
             raise HTTPException(status.HTTP_404_NOT_FOUND)
         if db_account.hashed_password is None:
-            raise Exception(f"Expected active account (id={db_account.id}) to contain hashed_password attribute but found None")
+            raise Exception(
+                f"Expected active account (id={db_account.id}) to contain hashed_password attribute but found None"
+            )
         if not checkpw(password.encode(), db_account.hashed_password.encode()):
             raise HTTPException(status.HTTP_401_UNAUTHORIZED)
         auth_token_id = AuthTokenId(str(uuid4()))
@@ -124,7 +126,7 @@ class AccountService:
             token=auth_token_id,
             account_f=db_account.id,
             expiration=datetime.now() + Config.AUTH_TOKEN_EXPIRATION,
-            revoked=False
+            revoked=False,
         )
         auth_token_dal.delete_by_account(db_account.id)
         auth_token_dal.create(BE_auth_token)

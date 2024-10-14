@@ -137,7 +137,7 @@ class Course(BaseModel):
     id: CourseId
     name: str
     deleted: bool
-    source_type: 'SourceType'
+    source_type: "SourceType"
     source: Optional[str] = None
 
     class Config:

@@ -27,7 +27,7 @@ router = APIRouter(
 
 @router.get("/user")
 def get_my_account(account: ACCOUNT) -> MT_Account:
-        return AccountService.get_by_id(account.id)
+    return AccountService.get_by_id(account.id)
 
 
 @router.get("/user/{account_id}")

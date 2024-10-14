@@ -23,7 +23,13 @@ def moodle_course_to_BE_course(
     BE_Course, list[BE_Account], list[BE_Student], list[BE_Ta], list[BE_Teacher]
 ]:
     course_id = BE_CourseId(str(uuid4()))
-    course = BE_Course(id=course_id, name=moodle_course.name, deleted=False, source_type=SourceType.MOODLE, source=moodle_course.id)
+    course = BE_Course(
+        id=course_id,
+        name=moodle_course.name,
+        deleted=False,
+        source_type=SourceType.MOODLE,
+        source=moodle_course.id,
+    )
     accounts: list[BE_Account] = []
     students: list[BE_Student] = []
     tas: list[BE_Ta] = []

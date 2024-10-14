@@ -2,7 +2,9 @@ from typing import Optional
 from fastapi import HTTPException, status
 from darwin.backend import Backend
 from darwin.midtier.clients.moodle.moodle_client import MoodleClient
-from darwin.midtier.formatters.moodle_course_to_BE_course import moodle_course_to_BE_course
+from darwin.midtier.formatters.moodle_course_to_BE_course import (
+    moodle_course_to_BE_course,
+)
 from darwin.models.client_models import MoodleCourse
 from darwin.models.midtier_models import (
     Account,
@@ -15,7 +17,14 @@ from darwin.models.midtier_models import (
     Ta as MT_Ta,
     Teacher as MT_Teacher,
 )
-from darwin.models.backend_models import AccessLevel, AccountPermission, Course as BE_Course, AccountId, ResourcePermission, SourceType
+from darwin.models.backend_models import (
+    AccessLevel,
+    AccountPermission,
+    Course as BE_Course,
+    AccountId,
+    ResourcePermission,
+    SourceType,
+)
 from darwin.midtier.formatters.BE_assignment_to_basic_assignment import (
     BE_assignment_to_basic_assignment,
 )
@@ -90,7 +99,9 @@ class CourseService:
 
         for BE_teacher in BE_teachers:
             account = account_map[BE_teacher.account_f]
-            teacher = MT_Teacher(id=BE_teacher.id, name=account.name, email=account.email)
+            teacher = MT_Teacher(
+                id=BE_teacher.id, name=account.name, email=account.email
+            )
             teachers.append(teacher)
 
         for BE_ta in BE_tas:
@@ -100,7 +111,9 @@ class CourseService:
 
         for BE_student in BE_students:
             account = account_map[BE_student.account_f]
-            student = MT_Student(id=BE_student.id, name=account.name, email=account.email)
+            student = MT_Student(
+                id=BE_student.id, name=account.name, email=account.email
+            )
             students.append(student)
 
         assignments = [
@@ -118,26 +131,39 @@ class CourseService:
         )
 
     @staticmethod
-    def create_moodle_course(account: Account, moodle_course_create: MoodleCourseCreate) -> MT_Course:
-        if course_dal.get_by_source(source_type=SourceType.MOODLE, source=moodle_course_create.id) is not None:
-            raise HTTPException(status.HTTP_409_CONFLICT, f"Moodle Course with id {moodle_course_create.id}")
+    def create_moodle_course(
+        account: Account, moodle_course_create: MoodleCourseCreate
+    ) -> MT_Course:
+        if (
+            course_dal.get_by_source(
+                source_type=SourceType.MOODLE, source=moodle_course_create.id
+            )
+            is not None
+        ):
+            raise HTTPException(
+                status.HTTP_409_CONFLICT,
+                f"Moodle Course with id {moodle_course_create.id}",
+            )
 
         try:
             moodle_course: MoodleCourse = MoodleClient(
                 moodle_course_create.moodle_session,
             ).html_get_course(moodle_course_create.id)
         except Exception as e:
-            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, f"Issue scraping moodle course: {e}")
+            raise HTTPException(
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+                f"Issue scraping moodle course: {e}",
+            )
 
         # Validate creator is part of the class or admin
-        if account.permission != AccountPermission.ADMIN and account.email not in map(lambda p: p.email, moodle_course.participants):
+        if account.permission != AccountPermission.ADMIN and account.email not in map(
+            lambda p: p.email, moodle_course.participants
+        ):
             raise HTTPException(status.HTTP_401_UNAUTHORIZED)
-
 
         course, accounts, students, tas, teachers = moodle_course_to_BE_course(
             moodle_course
         )
-
 
         # Create Business Models
         Backend.course_dal.create(course)
@@ -149,11 +175,29 @@ class CourseService:
 
         # Create access control Models
         for student in students:
-            Backend.resource_permission_dal.create(ResourcePermission(account_id=student.account_f, resource_id=course.id, access_level=AccessLevel.RD))
+            Backend.resource_permission_dal.create(
+                ResourcePermission(
+                    account_id=student.account_f,
+                    resource_id=course.id,
+                    access_level=AccessLevel.RD,
+                )
+            )
         for ta in tas:
-            Backend.resource_permission_dal.create(ResourcePermission(account_id=ta.account_f, resource_id=course.id, access_level=AccessLevel.RD_WR))
+            Backend.resource_permission_dal.create(
+                ResourcePermission(
+                    account_id=ta.account_f,
+                    resource_id=course.id,
+                    access_level=AccessLevel.RD_WR,
+                )
+            )
         for teacher in teachers:
-            Backend.resource_permission_dal.create(ResourcePermission(account_id=teacher.account_f, resource_id=course.id, access_level=AccessLevel.RD_WR_DEL))
+            Backend.resource_permission_dal.create(
+                ResourcePermission(
+                    account_id=teacher.account_f,
+                    resource_id=course.id,
+                    access_level=AccessLevel.RD_WR_DEL,
+                )
+            )
 
         account_lookup = {a.id: a for a in accounts}
         mt_students: list[MT_Student] = []
@@ -193,7 +237,6 @@ class CourseService:
             students=mt_students,
             assignments=[],
         )
-
 
 
 if __name__ == "__main__":

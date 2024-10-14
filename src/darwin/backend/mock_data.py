@@ -23,12 +23,24 @@ from darwin.models.backend_models import (
     TeacherId,
 )
 
+
 def to_pw(password: str) -> str:
     return hashpw(password.encode(), gensalt()).decode()
 
+
 class MockData:
-    COURSE_1 = Course(id=CourseId("8974845845"), name="COSI 89B", source_type=SourceType.DISK, deleted=False)
-    COURSE_2 = Course(id=CourseId("asdfjgk"), name="COSI 400", source_type=SourceType.DISK, deleted=False)
+    COURSE_1 = Course(
+        id=CourseId("8974845845"),
+        name="COSI 89B",
+        source_type=SourceType.DISK,
+        deleted=False,
+    )
+    COURSE_2 = Course(
+        id=CourseId("asdfjgk"),
+        name="COSI 400",
+        source_type=SourceType.DISK,
+        deleted=False,
+    )
 
     # Account 1
     STUDENT_ACCOUNT_1 = Account(

@@ -10,13 +10,19 @@ from darwin.models.midtier_models import (
     AccountId,
     CourseId,
 )
-from darwin.midtier.modules.authentication import ACCOUNT, raise_if_not_admin, raise_if_unauthorized_create, raise_if_unauthorized_get
+from darwin.midtier.modules.authentication import (
+    ACCOUNT,
+    raise_if_not_admin,
+    raise_if_unauthorized_create,
+    raise_if_unauthorized_get,
+)
 
 router = APIRouter(
     prefix="/course",
     tags=["course"],
     responses={404: {"description": "Not found"}},
 )
+
 
 @router.get("/user/")
 def get_all_courses_for_self(account: ACCOUNT):

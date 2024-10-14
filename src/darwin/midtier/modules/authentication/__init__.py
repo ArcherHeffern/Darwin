@@ -16,20 +16,26 @@ resource_permission_dal = Backend.resource_permission_dal
 
 ACCOUNT = Annotated[Account, Depends(get_auth_level)]
 
+
 def raise_if_not_admin(account: Account):
     if account.permission != AccountPermission.ADMIN:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
-def raise_if_unauthorized_create(account: Account, min_req_permission: AccountPermission):
+
+def raise_if_unauthorized_create(
+    account: Account, min_req_permission: AccountPermission
+):
     if account.permission.value < min_req_permission.value:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
-        
+
+
 def raise_if_unauthorized_get(account: Account, resource: ResourceId):
     if account.permission is AccountPermission.ADMIN:
         return
     permission = resource_permission_dal.get(account.id, resource)
     if permission is None or permission.access_level == AccessLevel.NONE:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
 
 def raise_if_unauthorized_modify(account: Account, resource: ResourceId):
     if account is None:
