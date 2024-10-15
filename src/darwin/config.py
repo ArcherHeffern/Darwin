@@ -1,5 +1,6 @@
 from datetime import timedelta
 from dotenv import dotenv_values
+from os import environ
 
 ms = "MOODLE_SESSION"
 cid = "COURSE_ID"
@@ -11,6 +12,13 @@ env = dotenv_values()
 if env[ms] is None or env[cid] is None or env[gap] is None or env[em] is None:
     raise Exception("Config error")
 
+__LOCAL_WEB_HOST = "127.0.0.1:3000"
+__DEPLOYED_WEB_HOST = "172.20.129.207:3000"
+
+if environ.get("DEBUG"):
+    _web_host = __LOCAL_WEB_HOST
+else:
+    _web_host = __DEPLOYED_WEB_HOST
 
 class Config:
     PROGRAM_NAME = "Darwin"
@@ -18,9 +26,7 @@ class Config:
     ACCOUNT_CREATE_TOKEN_EXPR_TIME: timedelta = timedelta(minutes=15)
     AUTH_TOKEN_EXPIRATION: timedelta = timedelta(days=30)
 
-    __LOCAL_WEB_HOST = "127.0.0.1:3000"
-    __DEPLOYED_WEB_HOST = "172.20.129.207:3000"
-    WEB_HOST = __DEPLOYED_WEB_HOST
+    WEB_HOST = _web_host
 
     VERIFY_EMAIL_URL = WEB_HOST + "/signup/verify"
 
