@@ -24,7 +24,7 @@ router = APIRouter(
 )
 
 
-@router.get("/user/")
+@router.get("/user")
 def get_all_courses_for_self(account: ACCOUNT):
     return CourseService.get_all_basic(account.id)
 

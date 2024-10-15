@@ -47,12 +47,20 @@ class AccountCreateP1(BaseAccount):
 
 
 class AccountCreateP1Response(BaseModel):
-    ttl: timedelta
+    ttl: str # timedelta to string
 
 
 class AccountCreateP2(BaseAccount):
     name: str
     password: str
+
+class LoginResponse(BaseModel):
+    access_token: str
+    account_id: AccountId
+    expiration: datetime
+    name: str
+    permission: AccountPermission
+    token_type: str = "bearer"
 
 
 class Account(BaseAccount):
@@ -127,11 +135,12 @@ AuthToken
 
 class BaseAuthToken(BaseModel): ...
 
+class AuthTokenVerify(BaseAuthToken):
+    auth_token: AuthTokenId
 
-class AuthToken(BaseModel):
+class AuthToken(BaseAuthToken):
     auth_token: AuthTokenId
     expiration: datetime
-
 
 """
 ================

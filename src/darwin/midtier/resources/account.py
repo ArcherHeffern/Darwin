@@ -6,9 +6,11 @@ from darwin.models.midtier_models import (
     AccountCreateP1,
     AccountCreateP1Response,
     AccountCreateP2,
+    LoginResponse,
     AccountId,
     Account as MT_Account,
     AuthTokenId,
+    AuthTokenVerify,
 )
 from darwin.models.backend_models import (
     Account as BE_Account,
@@ -54,13 +56,19 @@ def verify_email(
     return AccountService.create_p2(token, account_create)
 
 
+@router.post("/verify_token")
+def verify_token(token: AuthTokenVerify):
+    AccountService.verify_token(token.auth_token)
+
 def upgrade_account(account_id: AccountId, account_permission: AccountPermission): ...
 
 
 @router.post("/login")
-def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
-    auth_token = AccountService.login(form_data.username, form_data.password).auth_token
-    return {"access_token": auth_token, "token_type": "bearer"}
+def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> LoginResponse:
+    return AccountService.login(form_data.username, form_data.password)
 
 
-def logout(): ...
+@router.post("/logout")
+def logout(account: ACCOUNT): 
+    AccountService.logout(account.id)
+    

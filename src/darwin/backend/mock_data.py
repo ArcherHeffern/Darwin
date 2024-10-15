@@ -116,7 +116,7 @@ class MockData:
     # Account 5
     ADMIN_ACCOUNT_1 = Account(
         id=AccountId("SUPERGODGOATED"),
-        email="god",
+        email="g@d",
         name="Adam",
         hashed_password=to_pw("steve"),
         status=AccountStatus.REGISTERED,

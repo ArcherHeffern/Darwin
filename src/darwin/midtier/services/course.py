@@ -142,7 +142,7 @@ class CourseService:
         ):
             raise HTTPException(
                 status.HTTP_409_CONFLICT,
-                f"Moodle Course with id {moodle_course_create.id}",
+                f"Moodle Course with id {moodle_course_create.id} already exists",
             )
 
         try:
@@ -152,7 +152,7 @@ class CourseService:
         except Exception as e:
             raise HTTPException(
                 status.HTTP_500_INTERNAL_SERVER_ERROR,
-                f"Issue scraping moodle course: {e}",
+                f"Issue scraping moodle course. The course may not exist or your MoodleSession may be invalid - {e}",
             )
 
         # Validate creator is part of the class or admin

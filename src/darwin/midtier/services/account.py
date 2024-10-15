@@ -19,6 +19,7 @@ from darwin.models.midtier_models import (
     AccountCreateP1,
     AccountCreateP1Response,
     AccountCreateP2,
+    LoginResponse,
     AuthToken as MT_AuthToken,
 )
 from darwin.midtier.formatters import account_formatter
@@ -70,11 +71,12 @@ class AccountService:
         # Send email
         Gmail.send(
             account_create.email,
-            "Darwin Email Verification",
-            f"Verify this is your email: {Config.WEB_HOST}/account/verify/{account_create_token.id}",
+            f"{Config.PROGRAM_NAME} Email Verification",
+            f"Verify this is your email: {Config.VERIFY_EMAIL_URL}/{account_create_token.id}\n\nIf this was not you, ignore this email",
         )
 
-        return AccountCreateP1Response(ttl=Config.ACCOUNT_CREATE_TOKEN_EXPR_TIME)
+        return AccountCreateP1Response(ttl=str(Config.ACCOUNT_CREATE_TOKEN_EXPR_TIME))
+
 
     @staticmethod
     def create_p2(
@@ -110,8 +112,9 @@ class AccountService:
 
         return account_formatter.BE_2_MT(BE_account)
 
+
     @staticmethod
-    def login(username: str, password: str) -> MT_AuthToken:
+    def login(username: str, password: str) -> LoginResponse:
         db_account = account_dal.get_by_email(username)
         if db_account is None or db_account.status != AccountStatus.REGISTERED:
             raise HTTPException(status.HTTP_404_NOT_FOUND)
@@ -130,4 +133,26 @@ class AccountService:
         )
         auth_token_dal.delete_by_account(db_account.id)
         auth_token_dal.create(BE_auth_token)
-        return auth_token_formatter.BE_2_MT(BE_auth_token)
+        return LoginResponse(
+            access_token=auth_token_id,
+            account_id=db_account.id,
+            expiration=BE_auth_token.expiration,
+            name=db_account.name,
+            permission=db_account.permission,
+        )
+    
+    @staticmethod
+    def logout(account_id: AccountId):
+        auth_token_dal.delete_by_account(account_id)
+    
+    @staticmethod
+    def verify_token(token: AuthTokenId):
+        maybe_auth_token = auth_token_dal.get(token)
+        if maybe_auth_token is None:
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND, "Account Creation Token Not Found"
+            )
+
+        if maybe_auth_token.expiration < datetime.now():
+            raise HTTPException(status.HTTP_408_REQUEST_TIMEOUT, "Token is expired")
+        

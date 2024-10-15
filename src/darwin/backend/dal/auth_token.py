@@ -25,6 +25,10 @@ class AuthTokenDal(Dal_I):
             if maybe_auth_token is None:
                 return None
             return M_AuthToken.model_validate(maybe_auth_token)
+    
+    def delete(self, auth_token: AuthTokenId):
+        with self.db_session() as db:
+            db.query(S_AuthToken).filter_by(token=auth_token).delete()
 
     def delete_by_account(self, account_id: AccountId):
         with self.db_session() as db:
