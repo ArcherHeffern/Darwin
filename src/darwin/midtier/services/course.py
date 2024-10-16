@@ -152,7 +152,7 @@ class CourseService:
         except Exception as e:
             raise HTTPException(
                 status.HTTP_500_INTERNAL_SERVER_ERROR,
-                f"Issue scraping moodle course. The course may not exist or your MoodleSession may be invalid - {e}",
+                f"Issue scraping moodle course. The course may not exist, you may not have permission to scrape this course (Must be a TA+) or your MoodleSession cookie may be invalid - {e}",
             )
 
         # Validate creator is part of the class or admin
