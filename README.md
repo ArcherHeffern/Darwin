@@ -7,13 +7,22 @@ Since we already have unit tests, we can automate the majority of this process.
 
 # Important Branches
 1. Darwin API: API for the full stack web app
-2. grading_script: Script for running tests locally - Outputs results (passing, failures, errors, failure/error messages) as a text file
+2. grading_script: Script for running tests locally
+   Outputs results (passing, failures, errors, failure/error messages) as a text file
+   View grading_script README for usage. 
 
-Supports a variety of options. There is no command line argument parser yet because I'm not yet set on an API
+# Darwin API
+## Set Up
+```bash
+python3.12 -m venv .venv # Create virtual environment
+source .venv/bin/activate # Activate virtual environment
+pip3.12 install -e . # install dependencies
+```
 
-# Flow 
-There are 3 axis to errors, Graded/Ungraded, and Blocking/NonBlocking, Notifying/Non-Notifying
+## Running
+View scripts folder for options
 
+# Flow
 ## Overview
 PA Configuration -> Student Data Parser -> Project Installer / Validation -> Project Setup / Validation -> Test Runner -> Grader -> Notification System
 
@@ -50,19 +59,6 @@ Downloads, unzips, moves projects to workspace directory, and performs basic val
 
 ## Grade Uploader
 
-# Planned Features
-- Auto running unit tests
-    - Since junit outputs raw text, I will need to write a junit test output parser
-- Auto grading
-- View TODO for the rest of my plans
-
-# Set up
-## .env
-1. MoodleSession cookie
-2. id query string parameter
-
-## Ant
-`brew install ant`
 
 ## Virtual environment
 `pip install .`
