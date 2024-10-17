@@ -2,7 +2,7 @@ from os import symlink
 from typing import Optional
 from Atypes import BadConfigException, ProjectExecutionException, TestCase
 import xml.etree.ElementTree as ET
-from subprocess import run, DEVNULL
+from subprocess import run, DEVNULL, TimeoutExpired
 from pathlib import Path
 from ..project_I import Project_I
 from Atypes import TestResult
@@ -60,7 +60,10 @@ class MavenProject(Project_I):
 
     def run_tests(self) -> TestResult:
         test_str = ",".join(self.tests)
-        run(["mvn", f"-Dtest={test_str}", "test"], stdout=DEVNULL)
+        try:
+            run(["mvn", f"-Dtest={test_str}", "test"], stdout=DEVNULL, timeout=60)
+        except TimeoutExpired as e:
+            print("TIMEOUT EXPIRED")
         test_metadata = ET.parse(self.test_report_location.absolute()).getroot()
         if test_metadata is None:
             raise ProjectExecutionException("Could not find or parse maven test output")
@@ -78,10 +81,18 @@ class MavenProject(Project_I):
         # TODO END
         testcase_nodes = test_metadata.findall("testcase")
 
+        passing: int
+        erroring: int
+        skipped: int
+        failing: int
         passing_tests: list[TestCase] = []
         erroring_tests: list["TestCase"] = []
         skipped_tests: list["TestCase"] = []
         failing_tests: list["TestCase"] = []
+        erroring = int(test_metadata.get("errors")) # type: ignore
+        failing = int(test_metadata.get("failures")) # type: ignore
+        skipped = int(test_metadata.get("skipped")) # type: ignore
+        passing = int(test_metadata.get("tests")) - erroring - failing - skipped # type: ignore
         for testcase_node in testcase_nodes:
             a = testcase_node.attrib
             maybe_failure_node: Optional[ET.Element] = testcase_node.find("failure")
@@ -89,9 +100,9 @@ class MavenProject(Project_I):
             maybe_failure_msg: Optional[str] = None
             maybe_error_msg: Optional[str] = None
             if maybe_failure_node is not None:
-                maybe_failure_msg = maybe_failure_node.get("message")
+                maybe_failure_msg = maybe_failure_node.get("message") or maybe_failure_node.get("type")
             if maybe_error_node is not None:
-                maybe_error_msg = maybe_error_node.get("message")
+                maybe_error_msg = maybe_error_node.get("message") or maybe_error_node.get("type")
             test_case = TestCase(
                 a["name"], a["classname"], a["time"], maybe_failure_msg, maybe_error_msg
             )
@@ -102,4 +113,4 @@ class MavenProject(Project_I):
                 erroring_tests.append(test_case)
             else:
                 passing_tests.append(test_case)
-        return TestResult(passing_tests, erroring_tests, skipped_tests, failing_tests)
+        return TestResult(passing, failing, erroring, skipped, passing_tests, erroring_tests, skipped_tests, failing_tests)

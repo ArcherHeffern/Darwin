@@ -28,9 +28,9 @@ class CSVStorage:
             self.writer.writerow(
                 {
                     "student": student.name,
-                    "passing": len(test_result.passing_tests),
-                    "erroring": len(test_result.erroring_tests),
-                    "failing": len(test_result.failing_tests),
+                    "passing": test_result.passing,
+                    "erroring": test_result.erroring,
+                    "failing": test_result.failing,
                 }
             )
         if self.f:

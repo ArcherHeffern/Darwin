@@ -32,6 +32,10 @@ class Student:
 
 @dataclass
 class TestResult:
+    passing: int
+    failing: int
+    erroring: int
+    skipped: int
     passing_tests: list["TestCase"]
     erroring_tests: list["TestCase"]
     skipped_tests: list["TestCase"]

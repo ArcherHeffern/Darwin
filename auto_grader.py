@@ -4,12 +4,11 @@ from Atypes import (
     Student,
     FileSubmissionGroup,
     FileSubmission,
-    GradingData,
 )
 from clients.moodle.moodle_client import MoodleClient
 from clients.student_filterer import StudentFilterer
 from installer import Installer
-from storage.csv_storage import CSVStorage
+from storage.text_storage import TextStorage
 from validators_and_executors.eclipsemaven.project_impl import MavenProject
 from validators_and_executors.eclipsemaven.project_validator_Impl import (
     MavenProjectValidator,
@@ -24,9 +23,14 @@ from pathlib import Path
 from typing import Optional, Literal
 
 # ======== PA Context ========
+PA_NAME = "2"
+DUE_DATE = datetime(2024, 10, 1, 23, 59, 59)
+TESTS_TO_RUN: list[str] = ["AllConcurrentTests"]
+TEST_OUTPUT_FILE_NAME = "TEST-cs131.pa2.AllConcurrentTests.xml"
+student_filterer = StudentFilterer()
+OUTFILE_NAME = "out.txt"
 
-PA_NAME = "1"
-DUE_DATE = datetime(2024, 9, 19, 23, 59, 59)
+# ======= Secret PA Context =========
 # DATE_TO_RUN =
 # FREQUENCY_OF_RERUNS: literal['exponential-backoff', 'linear']
 # MAX_RERUNS: int = 3
@@ -34,7 +38,6 @@ SOURCE: Literal["moodle"] = "moodle"
 PROJECT_TYPE: Literal["maven"] = "maven"
 TEST_CLASS_FILES: Path = Path("./compiled_testfiles").absolute()
 OUTPUT_TYPE: Literal["csv", "moodle"] = "csv"
-TESTS_TO_RUN: list[str] = ["AllSequentialTests"]
 
 METADATA = AssignmentMetadata(None)
 
@@ -55,7 +58,7 @@ VERBOSE_PROJECT_VALIDATION: bool = True
 VERBOSE_TEST_RUNNING: bool = True
 VERBOSE_GRADING: bool = True
 VERBOSE_GRADE_UPLOADING: bool = True
-OUTFILE: Path = Path("out.csv")
+OUTFILE: Path = Path(OUTFILE_NAME)
 
 # ======== Runtime Errors ========
 DOWNLOAD_ERRORS: list[
@@ -90,7 +93,6 @@ if __name__ == "__main__":
     installer = Installer(
         moodle_client, MavenProjectValidator(), install_logger, WORKSPACE_DIR
     )
-    student_filterer = StudentFilterer()
 
     # Project Validation Services
     project_validation_logger = Logger(VERBOSE_PROJECT_VALIDATION, "PROJECT VALIDATION")
@@ -99,7 +101,7 @@ if __name__ == "__main__":
         TEST_CLASS_FILES,
         Path("./target/test-classes"),
         TESTS_TO_RUN,
-        Path("./target/surefire-reports/TEST-cs131.pa1.AllSequentialTests.xml"),
+        Path(f"./target/surefire-reports/{TEST_OUTPUT_FILE_NAME}"),
         2.5,
     )
 
@@ -111,7 +113,7 @@ if __name__ == "__main__":
 
     # Grade Uploading Services
     grade_upload_logger = Logger(VERBOSE_GRADE_UPLOADING, "GRADE UPLOADER")
-    with CSVStorage(assignment, OUTFILE) as storage_service:
+    with TextStorage(assignment, OUTFILE) as storage_service:
 
         students = installer.get_students(student_filterer)
 
