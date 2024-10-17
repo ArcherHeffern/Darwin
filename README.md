@@ -5,8 +5,9 @@ Grading Programming Assignments is a needlessly labor intensive process. Install
 
 Since we already have unit tests, we can automate the majority of this process.
 
-# Features
-Currently supports downloading all or a filtered range of projects from moodle, parsing all user information for later steps, unzipping projects into the correct directory, and deleting the zip files.  
+# Important Branches
+1. Darwin API: API for the full stack web app
+2. grading_script: Script for running tests locally - Outputs results (passing, failures, errors, failure/error messages) as a text file
 
 Supports a variety of options. There is no command line argument parser yet because I'm not yet set on an API
 
