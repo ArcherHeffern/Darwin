@@ -12,6 +12,23 @@ Since we already have unit tests, we can automate the majority of this process.
    View grading_script README for usage. 
 
 # Darwin API
+## Features
+- Authentication (Sign up, sign in) with Email verification using SMTP, OAuth protocol, hashed passwords, and revokable / expiring tokens
+- Admin Panel to manage users and assignments
+- Data access control - Read, Write, and Delete permissions for all data
+- Course management
+- Pulling of courses from Moodle
+- Pulling of assignments from Moodle
+- A lot of other things I'm forgetting...
+
+## Tech Stack
+python, sqlalchemy, sqlite3, fastapi
+I intentionally keep very few dependencies to minimize costs for the CS department when I leave
+
+## Architecture
+- Backend data access layer
+- Miditer presentation layer
+
 ## Set Up
 ```bash
 python3.12 -m venv .venv # Create virtual environment
