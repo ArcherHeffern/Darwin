@@ -1,1 +1,0 @@
-Contains classes responsible for validating, building, and running different projects

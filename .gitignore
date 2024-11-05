@@ -6,4 +6,6 @@ workspace/
 **/__pycache__
 TestStudentPA1*
 compiled_testfiles
-out.csv
+out.*
+FirstnameLastname*
+pa*
