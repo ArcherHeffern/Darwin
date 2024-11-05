@@ -20,11 +20,11 @@ class StoreGradesToFile:
             self.f.close()
 
 
-    def store_grade(self, student: Student, test_results: list[TestResult]):
+    def store_grade(self, student: Student, test_results: list[TestResult], tests: list[str]):
         f = self.f
         if f:
-            for test_result in test_results:
-                f.write(f"{student.name} {test_result.passing} {test_result.erroring} {test_result.failing}\n")
+            for i, test_result in enumerate(test_results):
+                f.write(f"{student.name}: {tests[i]} {test_result.passing} {test_result.erroring} {test_result.failing}\n")
                 f.write("Erroring\n")
                 for erroring in test_result.erroring_tests:
                     f.write("\t" + str(erroring) + "\n")

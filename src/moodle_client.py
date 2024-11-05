@@ -1,4 +1,4 @@
-from Atypes import Student, Submission
+from Atypes import Assignment, Student, Submission
 from bs4 import BeautifulSoup
 from datetime import datetime
 from calendar import Month
@@ -6,7 +6,10 @@ from regex import match
 import requests
 from Atypes import Student
 from pathlib import Path
+from itertools import chain
 
+def flatmap(func, *iterable):
+    return chain.from_iterable(map(func, *iterable))
 
 class MoodleClient:
 
@@ -17,12 +20,13 @@ class MoodleClient:
         "Host": "moodle.brandeis.edu",
     }
 
-    def __init__(self, moodle_session: str, assignment_id: str):
+    def __init__(self, moodle_session: str, assignment: Assignment):
         self.cookies = {
             "MoodleSession": moodle_session,
         }
 
-        self.params = {"id": assignment_id, "tifirst": "", "tilast": "", "action": "grading"}
+        self.params = {"id": assignment.id, "tifirst": "", "tilast": "", "action": "grading"}
+        self.assignment = assignment
 
     def get_students(self) -> list[Student]:
         r = requests.get(
@@ -55,7 +59,6 @@ class MoodleClient:
             sid: int
             name: str
             email: str
-            submissions: list[Submission] = []
 
             sid = submission_node["class"][0].removeprefix("user")
             name_tokens = [
@@ -66,10 +69,11 @@ class MoodleClient:
             email = submission_node.findChild("td", class_="cell c3 email").text.strip()
             submitted = self.__has_submission(submission_node)
 
+            submissions: list[Submission] = []
             student = Student(sid, name, name_tokens, email, submissions)
 
             if submitted:
-                submissions.extend(self.__parse_submissions(submission_node, student))
+                submissions = self.__parse_submissions(submission_node, student)
 
             student.submissions = submissions
             students.append(student)
@@ -93,10 +97,11 @@ class MoodleClient:
                 file_submission_time_node.text.strip()
             )
             submissions.append(
-                Submission(submission_url, submission_time, student, None)
+                Submission(submission_url, submission_time, student, self.assignment, None)
             )
 
-        return submission
+        return submissions
+    
 
     def __parse_submission_time(self, s: str) -> datetime:
         """September 19 2024, 4:11 PM"""

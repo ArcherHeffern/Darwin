@@ -10,8 +10,8 @@ from Atypes import TestResult
 class MavenProject:
     def __init__(
         self,
-        project: Path,
-        project_skeleton: Path,
+        project: Path, # Must be absolute
+        project_skeleton: Path, # Must be absolute
         test_classes_location: Path,
         tests: list[str],
         test_report_locations: list[Path],
@@ -39,7 +39,7 @@ class MavenProject:
             chdir(prev_dir)
 
     def __clean_project(self):
-        if run(["mvn", "clean", "-Dmaven.test.skip"], stdout=DEVNULL).returncode != 0:
+        if run(["mvn", "clean"], stdout=DEVNULL).returncode != 0:
             raise RuntimeError("Cleaning Program")
 
     def __compile_project(self):

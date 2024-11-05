@@ -5,6 +5,7 @@ from pathlib import Path
 
 @dataclass
 class Assignment:
+    id: str
     name: str
     
 @dataclass
@@ -42,9 +43,9 @@ class Submission:
     download_url: str
     date: datetime
     student: Student
+    assignment: Assignment
     file: Optional[Path]
 
     def get_filename(self):
-        if not self.file:
-            raise RuntimeError("Submission does not have name field")
-        return f"{self.file.name}-{self.student.sid}"
+        return f"{self.assignment.name}-{self.student.name}-{self.student.sid}"
+

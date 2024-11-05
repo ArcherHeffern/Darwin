@@ -1,5 +1,5 @@
 from os import chdir, getcwd
-from subprocess import run
+from subprocess import DEVNULL, run
 from Atypes import (
     Assignment,
 	TestResult,
@@ -14,21 +14,16 @@ from maven_project_validator import (
 )
 from traceback import format_exception
 import dotenv
-from pprint import PrettyPrinter
+from pprint import pprint
 from sys import stderr
 from pathlib import Path
 
 # ======== PA Context ========
 PA_NAME = "3"
-SKELETON: Path = Path("pa3")
-prev_dir = getcwd()
-chdir(SKELETON)
-run(["mvn", "compile"])
-chdir(prev_dir)
-exit()
+SKELETON: Path = Path("pa3").absolute()
 TESTS_TO_RUN: list[str] = ["BehaviorTest", "SimulationTest"]
 TEST_OUTPUT_FILE_NAMES = ["TEST-cs131.pa3.BehaviorTest.xml", "TEST-cs131.pa3.SimulationTest.xml"]
-student_filterer = StudentFilterer().filter_last_name("cohen", "cohen")
+student_filterer = StudentFilterer()
 
 # ======== Arguments ========
 INSTALL_ONLY = False
@@ -39,39 +34,45 @@ TEST_REPORT_LOCATIONS = [Path(f"./target/surefire-reports/{TEST_OUTPUT_FILE_NAME
 
 # ========= Constants =========
 TEST_CLASSES_LOCATION = Path("./target/test-classes")
-WORKSPACE_DIR = Path("./workspace")
+WORKSPACE_DIR = Path("./workspace").absolute()
 OUTFILE: Path = Path("out.txt")
 
-env = dotenv.dotenv_values()
-pprint = PrettyPrinter().pprint
-assignment = Assignment(PA_NAME)
-
-def grade():
+if __name__ == '__main__':
+    env = dotenv.dotenv_values()
     moodle_session = env.get("MOODLE_SESSION")
     assignment_id = env.get("ASSIGNMENT_ID")
     if not moodle_session:
         print("MOODLE_SESSION not found in .env", file=stderr)
         exit(1)
     if not assignment_id:
-        print("ID not found in .env", file=stderr)
+        print("ASSIGNMENT_ID not found in .env", file=stderr)
         exit(1)
 
     # Installation Services
-    moodle_client = MoodleClient(moodle_session, assignment_id)
+    ASSIGNMENT = Assignment(assignment_id, PA_NAME)
+    moodle_client = MoodleClient(moodle_session, ASSIGNMENT)
     maven_project_validator = MavenProjectValidator()
     installer = Installer(moodle_client, maven_project_validator, WORKSPACE_DIR)
-
-    # ======== Runtime Errors ========
     ERRORS: list[str] = []
 
-    with StoreGradesToFile(assignment, OUTFILE) as storage_service:
+    # Setup
+    print("Compiling test-classes")
+    prev_dir = getcwd()
+    chdir(SKELETON)
+    run(["mvn", "clean"], stdout=DEVNULL)
+    run(["mvn", "test-compile"], stdout=DEVNULL)
+    chdir(prev_dir)
 
+    with StoreGradesToFile(ASSIGNMENT, OUTFILE) as storage_service:
+        print("Getting students from moodle")
         students = moodle_client.get_students()
         students = student_filterer.filter(students)
         if SAFE_MODE:
             print("======== Students ========")
             pprint(students)
             exit(0)
+
+        print("Grading Submissions")
         for student in students:
             print(f"{student.name}=============")
             if len(student.submissions) == 0:
@@ -97,7 +98,7 @@ def grade():
                     continue
 
                 # ==== Test Running ====
-                project = MavenProject(project_root, SKELETON, TEST_CLASSES_LOCATION, TESTS_TO_RUN, TEST_REPORT_LOCATIONS, 60)
+                project = MavenProject(project_root.absolute(), SKELETON, TEST_CLASSES_LOCATION, TESTS_TO_RUN, TEST_REPORT_LOCATIONS, 60)
                 try:
                     results: list[TestResult] = project.test(project_root)
                 except Exception as e:
@@ -108,6 +109,6 @@ def grade():
 
                 # ======== Grading =======
                 try:
-                    storage_service.store_grade(student, results)
+                    storage_service.store_grade(student, results, TESTS_TO_RUN)
                 except Exception as e:
                     print(f"Issue with uploading grades '{student.name}' because of {e}")

@@ -9,7 +9,7 @@ class MavenProjectValidator:
 
     @classmethod
     def validate_and_extract_zipfile(cls, submission: Submission, zipfile: ZipFile, workspace: Path) -> Path:
-        # Returns extracted files name or raises RuntimeException
+        # Return root directory of project or raises RuntimeException
         project_root: Path = cls.__find_maven_project_root_from_files(zipfile.namelist())
 
         if project_root is None:
@@ -19,24 +19,23 @@ class MavenProjectValidator:
         else:
             raise NotImplementedError(f".project is deeply nested in zip file located at {project_root}")
 
-        extracted_file = workspace / project_root
+        extracted_file_relative = workspace / project_root
         # Validate naming
         for name in submission.student.name_tokens:
-            if name in extracted_file.name:
+            if name in extracted_file_relative.name:
                 break
         else:
             print(
-                f"{submission.student.name} improperly named their project directory as {extracted_file.name}"
+                f"{submission.student.name} improperly named their project directory as {extracted_file_relative.name}"
             )
 
         # Rename
-        new_extracted_file = Path(workspace) / submission.get_filename()
+        new_extracted_file_abs = (Path(workspace) / submission.get_filename()).absolute()
 
-        if new_extracted_file.exists():
-            new_extracted_file.unlink()
-        extracted_file.rename(new_extracted_file)
+        if not new_extracted_file_abs.exists():
+            extracted_file_relative.rename(new_extracted_file_abs) # TODO: If student uploads new submission, their file won't be updated
 
-        return new_extracted_file
+        return new_extracted_file_abs
 
 
     @classmethod
