@@ -80,7 +80,7 @@ class MoodleClient:
         return students
 
     def __parse_submissions(self, submission_node, student: Student) -> list[Submission]:
-        submission = submission_node.findChild("td", class_="cell c9")
+        submission = submission_node.findChild("td", class_="cell c8") # Was previously 9?
         file_submission_nodes = submission.findChildren(
             "div", class_="fileuploadsubmission"
         )

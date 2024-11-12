@@ -42,22 +42,12 @@ class Installer:
 
         self.client.download_file(submission.download_url, temporary_install_path)
 
-        with self.FileManager(temporary_install_path):  
-            if is_zipfile(temporary_install_path):
-                with ZipFile(temporary_install_path, "r") as zip_ref:
-                    root_path_abs = self.validator.validate_and_extract_zipfile(submission, zip_ref, self.workspace)
-            else:
-                raise NotImplementedError("no zipfile!")
+        if is_zipfile(temporary_install_path):
+            with ZipFile(temporary_install_path, "r") as zip_ref:
+                root_path_abs = self.validator.validate_and_extract_zipfile(submission, zip_ref, self.workspace)
+        else:
+            raise NotImplementedError("no zipfile!")
 
-            submission.file = root_path_abs
+        remove(temporary_install_path)
+        submission.file = root_path_abs
         return submission.file
-
-
-    class FileManager:
-        def __init__(self, file: Path):
-            self.file = file
-
-        def __enter__(self): ...
-
-        def __exit__(self, *args):
-            remove(self.file)
